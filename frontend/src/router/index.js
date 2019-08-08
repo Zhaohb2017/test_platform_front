@@ -149,15 +149,21 @@ export default new Router({
         // },
         // 知识项
         {
-          path: '/konwledge/skill/list',
+          path: '/testcase/skill/list',
           name: 'skill',
-          component: () => import('@/views/knowledge/skill/skill_list')
+          component: () => import('@/views/testcase/skill/skill_list')
         },
 
         {
-          path: '/konwledge/testpoint/list',
+          path: '/testcase/testpoint/list',
           name: 'TestPoint',
-          component: () => import('@/views/knowledge/testpoint/testpoint_list')
+          component: () => import('@/views/testcase/testpoint/testpoint_list')
+        },
+        //添加用例
+        {
+          path: '/testcase/addcase/list',
+          name: 'addcase',
+          component: () => import('@/views/testcase/addcase/case_list')
         },
         // 测试牌库
         {
@@ -170,7 +176,14 @@ export default new Router({
           path: '/cardentrepot/deploy/ip',
           name: 'deploy',
           component: () => import('@/views/cardEntrepot/deployIP/list_deployip')
-        }
+        },
+
+        // tool---添加俱乐部人数
+        {
+          path: '/tool/addclubpeople/list',
+          name: 'addclubpeople',
+          component: () => import('@/views/tool/addClubPeople/club_list')
+        },
 
 
       ]

@@ -11,17 +11,15 @@
 
             <el-form ref="AddCardFrom" :model="AddCardFrom" :rules='addrules' label-width="80px">
 
-
-
                 <el-form-item label="玩法" prop="c_gameMethod">
                     <el-input type="text" placeholder="请输入什么玩法" v-model="AddCardFrom.c_gameMethod"></el-input>
                 </el-form-item>
 
                 <el-form-item label="牌数据" prop="c_gameCard">
-                    <el-input type="text" placeholder="请输入牌数据" v-model="AddCardFrom.c_gameCard"></el-input>
+                    <el-input type="text" placeholder="请输入json格式数据" v-model="AddCardFrom.c_gameCard"></el-input>
                 </el-form-item>
 
-                <el-form-item label="备注说明" prop="c_gameCard">
+                <el-form-item label="备注说明" prop="c_remark">
                     <el-input type="text" placeholder="该牌使用于什么玩法" v-model="AddCardFrom.c_remark"></el-input>
                 </el-form-item>
             </el-form>
@@ -110,7 +108,7 @@
                 AddCardFrom: {
 
                     c_gameMethod:"",
-                    c_gameCard:"",
+                    c_gameCard:null,
                     c_remark:"",
                 },
 
@@ -129,8 +127,6 @@
                         }
                     ],
                 },
-
-
 
             };
         },
@@ -181,16 +177,20 @@
                 axios({
                     method:'post',
                     url:'/api/addcard/c_add',
-
                     data: {
                         c_gameMethod: this.AddCardFrom.c_gameMethod,
                         c_gameCard: this.AddCardFrom.c_gameCard,
                         c_remark: this.AddCardFrom.c_remark,
-
                     }
                 }).then(function(resp){
-                    that.$refs['AddCardFrom'].resetFields()
-                    that.re_data = resp.data
+                    that.$refs['AddCardFrom'].resetFields();
+                    if(resp.data == "请输入json格式数据"){
+                        alert(resp.data)
+                    }else{
+                        console.log(222222222222222)
+                        that.re_data = resp.data;
+                    }
+
                     setTimeout(() => {
                         that.$emit("reload")
                     }, 800);

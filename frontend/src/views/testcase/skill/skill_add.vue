@@ -158,13 +158,12 @@
                 let that = this;
                 if(this.$store.state.user != null){
                     if(this.AddSkillForm.s_date == ''){
-                        this.$message.error("日期不能为空.")
+                        this.$message.error("日期不能为空.");
                         return
                     }
-
                     if(this.AddSkillForm.s_link == ''){
 
-                        this.$message.error("链接不能为空.")
+                        this.$message.error("链接不能为空.");
                         return
                     }
                     if (this.AddSkillForm.s_link.slice(0,5)!="https" && this.AddSkillForm.s_link.slice(0,4)!="http"){
@@ -173,10 +172,9 @@
                     }
 
                     if(this.AddSkillForm.s_title == ''){
-                        this.$message.error("标题不能为空.")
+                        this.$message.error("标题不能为空.");
                         return
                     }
-                    console.log()
                     axios({
 
                         method:'post',

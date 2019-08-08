@@ -79,7 +79,7 @@
         </el-form-item>
 
         <el-form-item label="影响范围" prop="t_remark">
-          <el-input type="textarea" placeholder="请输入该测试点会影响的范围,详细描述清楚-可询问开发人员" v-model="AddPointFrom.b_reason"></el-input>
+          <el-input type="textarea" placeholder="请输入该测试点会影响的范围,详细描述清楚-可询问开发人员" v-model="AddPointFrom.t_remark"></el-input>
         </el-form-item>
 
       </el-form>
@@ -391,6 +391,7 @@
 
                 var _version = this.AddPointFrom.t_info[0];
                 var _module = this.AddPointFrom.t_info[1];
+                console.log(this.AddPointFrom.t_remark)
                 axios({
                     method:'post',
                     url:'/api/knowledge/k_add',

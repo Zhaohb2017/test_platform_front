@@ -11,13 +11,24 @@
 
             <el-form ref="AddServiceFrom" :model="AddServiceFrom" :rules='addrules' label-width="80px">
 
-
                 <el-form-item label="IP" prop="c_ip">
                     <el-input type="text" placeholder="请输入IP" v-model="AddServiceFrom.c_ip"></el-input>
                 </el-form-item>
 
                 <el-form-item label="port" prop="c_port">
                     <el-input type="text" placeholder="请输入端口" v-model="AddServiceFrom.c_port"></el-input>
+                </el-form-item>
+                <el-form-item label="账户" prop="c_user">
+                    <el-input type="text" placeholder="请输入账号" v-model="AddServiceFrom.c_user"></el-input>
+                </el-form-item>
+                <el-form-item label="密码" prop="c_pwd">
+                    <el-input type="text" placeholder="请输入密码" v-model="AddServiceFrom.c_pwd"></el-input>
+                </el-form-item>
+                <el-form-item label="路径" prop="c_path">
+                    <el-input type="text" placeholder="请输入路径" v-model="AddServiceFrom.c_path"></el-input>
+                </el-form-item>
+                <el-form-item label="牌文件名" prop="c_filename">
+                    <el-input type="text" placeholder="不填写默认为testcard.json文件" v-model="AddServiceFrom.c_filename"></el-input>
                 </el-form-item>
                 <el-form-item label="备注" prop="c_remake">
                     <el-input type="text" placeholder="" v-model="AddServiceFrom.c_remake"></el-input>
@@ -111,7 +122,11 @@
 
                     c_ip:"",
                     c_port:"",
+                    c_user:"",
+                    c_pwd:"",
+                    c_path:"",
                     c_remake:"",
+                    c_filename:"",
 
                 },
 
@@ -127,6 +142,16 @@
                     c_port: [
                         {
                             required: true, message: '端口不能为空', trigger: 'blur'
+                        }
+                    ],
+                    c_user: [
+                        {
+                            required: true, message: '账号不能为空.', trigger: 'blur'
+                        }
+                    ],
+                    c_path: [
+                        {
+                            required: true, message: '路径不能为空.', trigger: 'blur'
                         }
                     ],
                 },
@@ -182,12 +207,14 @@
                 axios({
                     method:'post',
                     url:'/api/deployip/i_add',
-
                     data: {
                         c_ip: this.AddServiceFrom.c_ip,
                         c_port: this.AddServiceFrom.c_port,
+                        c_user: this.AddServiceFrom.c_user,
+                        c_pwd: this.AddServiceFrom.c_pwd,
+                        c_path: this.AddServiceFrom.c_path,
+                        c_filename: this.AddServiceFrom.c_filename,
                         c_remake: this.AddServiceFrom.c_remake,
-
                     }
                 }).then(function(resp){
                     that.$refs['AddServiceFrom'].resetFields();

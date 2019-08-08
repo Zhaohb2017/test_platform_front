@@ -4,86 +4,57 @@
         <div class="head">
             <h3>牌库</h3>
             <el-button type="danger" @click="getKnowledgeList">刷新数据</el-button>
-            <el-button type="danger" @click="ChangeAddFlag" >添加知识</el-button>
+            <el-button type="danger" @click="ChangeAddFlag" >添加牌数据</el-button>
             <el-input type="text" prefix-icon="el-icon-search" required style="width:200px;" v-model="search_data" placeholder="请输入玩法搜索..."></el-input>
             <el-button type="primary" @click="Search" >搜索</el-button>
             <Addknowledge :visible.sync="show_flag" v-if="show_flag" @reload="reload"></Addknowledge>
-
-            <template>
-                &#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;
-                &#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;
-                &#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;
-                &#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;
-                &#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;
-
-                <el-select v-model="value" filterable placeholder="请选择配置服务器" >
-                    <el-option
-                            v-for="item in list"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value">
-                    </el-option>
-                </el-select>
-
-            </template>
+            <LoginName :visible.sync="dialogTableVisible" v-if="dialogTableVisible" :current_data="current_data" @reload="reload"></LoginName>
         </div>
 
-
         <!-- 展示列表 -->
+
         <el-table
-                :data="showSkillData"
+                :data="showPageData"
                 style="width: 100%"
                 border
                 :row-class-name="tableRowClassName"
                 :header-cell-style="{background: '#F5F5F5'}"
                 :default-sort = "{prop: 'c_date', order: 'ascending'}">
-<!--            <el-table-column prop="c_id" v-if="false">-->
-<!--            </el-table-column>-->
-
 
             <el-table-column label="玩法" width="180" min-width="180" header-align="center" prop="t_method">
             </el-table-column>
 
-            <el-table-column label="牌" width="500" min-width="180" header-align="center" prop="t_card" >
+            <el-table-column label="牌" width="1000" min-width="180" header-align="center" prop="t_card" >
             </el-table-column>
 
-            <el-table-column label="备注" width="500" min-width="180" header-align="center" prop="t_remark">
+            <el-table-column label="备注" width="200" min-width="180" header-align="center" prop="t_remark">
             </el-table-column>
-
 
             <el-table-column header-align="center" label="操作" align="center">
                 <template slot-scope="scope">
-                    <el-button size="mini" type="text" @click="ChangeEditFlag(scope.$index,scope.row)">配置至服务器</el-button>
-                    <!--          <el-button size="mini" type="text" :disabled="scope.row.c_status == 1" @click="RunCase(scope.$index, scope.row)">运行</el-button>-->
-                    <el-button size="mini" type="text" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-                    <SendData :visible.sync="senddata_show_flag" v-if="senddata_show_flag" @reload="reload"></SendData>
-                    <!--          <el-button size="mini" type="text" @click="ReadReports(scope.$index, scope.row)">查看报告</el-button>-->
+                    <el-button size="mini" type="primary" @click="ChangeConfig(scope.$index, scope.row)">配置至服务器</el-button>
+                    <el-button size="mini" type="text" @click="handleDelete(scope.$index,scope.row)">删除</el-button>
                 </template>
             </el-table-column>
-
-
-
-
         </el-table>
 
-        <!-- 分页 -->
         <div class="block">
             <el-pagination
+                    
+                    background
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
                     :current-page="currentPage"
                     :page-sizes="page_sizes_data"
                     :page-size="current_page_size"
-                    background
                     layout="total, sizes, prev, pager, next, jumper"
-                    :total="caseData.length">
+                    :total="showSkillData.length">
             </el-pagination>
         </div>
 
-        <EditSkills :visible.sync="edit_show_flag" v-if="edit_show_flag" :current_data="current_data" @reload="reload"></EditSkills>
-
     </div>
 </template>
+
 
 <style lang="less" scoped>
     .bugs{
@@ -131,46 +102,46 @@
     }
 </style>
 
-<script>
+<script type="es6">
     import axios from 'axios'
     import Addknowledge from './add_card'
-    // import SendData from './send_servers'
+    import LoginName   from "./ShowDeployIP"
     export default {
         components:{
             Addknowledge,
-            // SendData,
+            LoginName,
+
         },
+        name:"list_card",
 
         data() {
             return {
                 show_flag: false,
                 edit_show_flag: false,
                 report_show_flag: false,
-                senddata_show_flag: false,
-
+                show_deploy:false,
+                dialogTableVisible:false,
 
                 // 搜索内容
                 search_data: "",
 
                 // 编辑子组件传递数据类型
                 current_data:{},
-
+                currentPage:1,
                 // 报告数据
                 report_current_data: [],
 
                 //  页面页数选择
-                page_sizes_data: [5, 10],
-                // 当前页面
-                currentPage: 1,
+                page_sizes_data: [5],
+                //页面展示数据
+                showPageData:[],
+
                 // 当前页面展示数据
                 current_page_size: 5,
 
-                // 服务端返回所有数据
-                caseData: [],
-
                 // table展示数据
                 showSkillData: [],
-                showDeployData:[],
+
                 value:"",
 
                 // 当前初始的index
@@ -182,7 +153,8 @@
                 search: '',
                 list :[],
                 str_data:"",
-                states: ["Alabama","Alaska", "Arizona",]
+
+
 
 
             }
@@ -190,11 +162,12 @@
 
         mounted: function(){
             this.getKnowledgeList();
-            this.getdeployip();
-
+            console.log(`当前页33333333:`+this.showSkillData.length);
         },
 
         methods: {
+
+
             reload(){
                 if(this.edit_show_flag == true){
                     console.log("编辑组件调用了刷新")
@@ -209,32 +182,22 @@
                     console.log("报告组建调用了刷新")
                     this.report_show_flag = false;
                 }
-                if(this.senddata_show_flag == true){
-                    console.log("發生至服務器调用了刷新");
-                    this.senddata_show_flag = false;
+                if(this.show_deploy == true){
+                    console.log("配置IP刷新了哦")
+                    this.show_deploy = false;
                 }
-
                 //可以刷新列表什么的
                 this.getKnowledgeList()
 
             },
-            // 获取配置IP目录数据
-            getdeployip(){
-                let that = this;
-                axios({
-                    method:'get',
-                    url:'/api/deployip/d_list',
-                }).then(function (resp) {
-                    that.showDeployData = resp.data.sort();
-                    console.log("@@@@@@@@@@@@: ", that.showDeployData);
-                    that.list = that.showDeployData.map(item => {
-                        return {value: item, label: item};
-                    });
-                    console.log(33333333333333333,that.list)
 
-                })
+            //配置服务器ip弹窗
+            ChangeConfig(index,row){
+                this.current_data = row;
+                this.dialogTableVisible=true;
+                console.log("zzzzzzzzzzzz",index,this.current_data);
+
             },
-
 
             getKnowledgeList(){
                 let that = this;
@@ -243,9 +206,8 @@
                     url:'/api/addcard/c_list',
                 }).then(function(resp){
                     that.showSkillData = resp.data.sort();
-                    that.showSkillData = that.showSkillData.slice(0, that.current_page_size)
-                    console.log("showData1111111111111: ", that.showSkillData)
-
+                    that.showPageData = that.showSkillData.slice(0, that.current_page_size); //
+                    console.log(111111111111111111,that.showSkillData)
                 }).catch(resp => {
                     console.log('请求失败：'+resp.status+','+resp.statusText);
                 });
@@ -257,10 +219,22 @@
                 console.log("刷新弹窗: ", this.show_flag)
             },
 
-            //修改修改Bug实例弹窗显示状态
-            ChangeEditFlag(){
-                this.senddata_show_flag = true;
-                console.log("刷新配置服務器弹窗: ", this.senddata_show_flag)
+            SendData(row){
+                this.show_deploy = true;
+                console.log("xxxxxxxxxxxxxx: ", this.show_deploy);
+                let that = this;
+                axios({
+                    method:'post',
+                    url:'/api/deployip/send',
+                    params: {
+                        'id': that.value.substring(2,that.value.indexOf("-")),
+                        'card':row.t_card,
+                    }
+                }).then(function(resp){
+                    alert(resp.data)
+                }).catch(resp => {
+                    console.log('请求失败：'+resp.status+','+resp.statusText);
+                });
             },
 
             // 删除数据
@@ -273,20 +247,19 @@
                         axios({
                             method:'get',
                             url:'/api/addcard/c_del',
-                            params: {
+                            params:{
                                 't_id': t_id
-                            }
-                        }).then(function(resp){
-                            // that.caseData = resp.data.sort();
-                            // that.showPointData = that.caseData.slice(0, that.current_page_size)
+                            },
+                        }).then(function (resp) {
                             that.getKnowledgeList();
 
-                        }).catch(resp => {
+                        }).catch(resp =>{
                             console.log('请求失败：'+resp.status+','+resp.statusText);
-                        });
+                        })
+
+                    }else{
+                        this.$message.error("请先登录.")
                     }
-                }else{
-                    this.$message.error("请先登录.")
                 }
 
             },
@@ -303,8 +276,8 @@
                     }
                 }).then(function(resp){
                     that.showSkillData = resp.data.sort();
-                    that.showPointData = that.showSkillData.slice(0, that.current_page_size)
-                    console.log("data", that.showSkillData)
+                    that.showPageData = that.showSkillData.slice(0, that.current_page_size);
+                    console.log("data", that.showPageData)
 
                 }).catch(resp => {
                     console.log('请求失败：'+resp.status+','+resp.statusText);
@@ -312,23 +285,23 @@
 
             },
 
-
             tableRowClassName({row, rowIndex}) {
                 if (rowIndex % 2 === 1) {
                     return 'success-row';
                 }
                 return '';
             },
-
-            // 修改每页显示行数
+            // 每页条数变更
             handleSizeChange(val) {
                 console.log(`每页 ${val} 条`);
-                this.current_page_size = val
-                this.showPointData = this.caseData.slice(0, val)
+                this.current_page_size = val;
+                this.showSkillData = this.showSkillData.slice(0, val);
+                console.log("@@@@@@@@@",this.showSkillData)
             },
 
-            //跳转第几页
+            // 当前页码变更
             handleCurrentChange(val) {
+                console.log(`当前页: ${val}`);
                 let count = this.current_page_size;
                 let n = val;
                 let end_index = count * n - 1;
@@ -340,7 +313,9 @@
                     end_index = end_index + 1;
                     start_index = end_index - count;
                 }
-                this.showPointData = this.caseData.slice(start_index, end_index)
+                console.log("start_index  "+start_index);
+                console.log("end_index  "+ end_index);
+                this.showPageData = this.showSkillData.slice(start_index, end_index);
 
                 //   this.caseData = (this.caseData).slice((index * val), this.caseData.length)
                 this.currentPage = val
@@ -352,4 +327,5 @@
                 window.open(url)
             }
     }}
+
 </script>

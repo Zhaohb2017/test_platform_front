@@ -1,7 +1,7 @@
 <template>
     <div v-if="edit_visible" class="lg">
         <el-dialog
-                title="添加知识"
+                title="编辑知识"
                 width="40%"
                 center
                 :show-close = "false"
@@ -21,7 +21,6 @@
                 <el-form-item label="知识链接" prop="t_link">
                     <el-input type="text" placeholder="输入知识链接" v-model="editSkillForm.t_link"></el-input>
                 </el-form-item>
-
 
 
             </el-form>
@@ -140,7 +139,6 @@
         },
 
         methods: {
-
 
             RemoveData(){
                 this.$refs['editSkillForm'].resetFields()

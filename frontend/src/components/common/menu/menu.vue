@@ -53,15 +53,16 @@
         <el-submenu index="2-1">
             <template slot="title">
                 <i class="el-icon-menu"></i>
-                <span>测试知识库</span>
+                <span>测试用例库</span>
             </template>
             <el-submenu index="6-1-1" >
-                <template slot="title" style="color: #409EFF" ><router-link to="/konwledge/testpoint/list">测试点</router-link></template>
+                <template slot="title" style="color: #409EFF" ><router-link to="/testcase/testpoint/list">测试点</router-link></template>
             </el-submenu>
-
             <el-submenu index="6-1-2">
-                <template slot="title"><router-link to="/konwledge/skill/list">知识项</router-link></template>
-
+                <template slot="title"><router-link to="/testcase/skill/list">知识项</router-link></template>
+            </el-submenu>
+            <el-submenu index="6-1-3">
+                <template slot="title"><router-link to="/testcase/addcase/list">添加用例</router-link></template>
             </el-submenu>
         </el-submenu>
 
@@ -77,6 +78,17 @@
             <el-submenu index="3-1-2" >
                 <template slot="title" style="color: #409EFF" ><router-link to="/cardentrepot/deploy/ip">配置IP</router-link></template>
             </el-submenu>
+        </el-submenu>
+
+        <el-submenu index="4-1">
+            <template slot="title">
+                <i class="el-icon-menu"></i>
+                <span>俱乐部操作</span>
+            </template>
+            <el-submenu index="4-1-1" >
+                <template slot="title" style="color: #409EFF" ><router-link to="/tool/addclubpeople/list">添加俱乐部人数</router-link></template>
+            </el-submenu>
+
         </el-submenu>
 
 <!--            <el-submenu index="1-2">-->

@@ -13,7 +13,7 @@
 
         <!-- 展示列表 -->
         <el-table
-                :data="showSkillData"
+                :data="showPageData"
                 style="width: 100%"
                 border
                 :row-class-name="tableRowClassName"
@@ -43,7 +43,7 @@
                 <template slot-scope="scope">
                     <el-button size="mini" type="text" @click="ChangeEditFlag(scope.$index,scope.row)">编辑</el-button>
                     <!--          <el-button size="mini" type="text" :disabled="scope.row.c_status == 1" @click="RunCase(scope.$index, scope.row)">运行</el-button>-->
-                    <el-button size="mini" type="text" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                    <el-button size="mini" type="text" @click="handleDelete(scope.$index, scope.row)" style="color: #fa0000">删除</el-button>
                     <!--          <el-button size="mini" type="text" @click="ReadReports(scope.$index, scope.row)">查看报告</el-button>-->
                 </template>
             </el-table-column>
@@ -61,7 +61,7 @@
                     :page-size="current_page_size"
                     background
                     layout="total, sizes, prev, pager, next, jumper"
-                    :total="caseData.length">
+                    :total="showSkillData.length">
             </el-pagination>
         </div>
 
@@ -137,7 +137,8 @@
 
                 // 编辑子组件传递数据类型
                 current_data:{},
-
+                //页面展示数据
+                showPageData:[],
                 // 报告数据
                 report_current_data: [],
 
@@ -193,8 +194,7 @@
                     url:'/api/knowledge/s_list',
                 }).then(function(resp){
                     that.showSkillData = resp.data.sort();
-                    console.log(that.showSkillData)
-                    that.showSkillData = that.showSkillData.slice(0, that.current_page_size)
+                    that.showPageData = that.showSkillData.slice(0, that.current_page_size);
                     console.log("showData: ", showSkillData)
 
                 }).catch(resp => {
@@ -238,8 +238,6 @@
                                 't_id': t_id
                             }
                         }).then(function(resp){
-                            // that.caseData = resp.data.sort();
-                            // that.showPointData = that.caseData.slice(0, that.current_page_size)
                             that.getKnowledgeList();
 
                         }).catch(resp => {
@@ -266,8 +264,7 @@
                     }
                 }).then(function(resp){
                     that.showSkillData = resp.data.sort();
-                    that.showPointData = that.showSkillData.slice(0, that.current_page_size)
-                    console.log("data", that.showSkillData)
+                    that.showPageData = that.showSkillData.slice(0, that.current_page_size);
 
                 }).catch(resp => {
                     console.log('请求失败：'+resp.status+','+resp.statusText);
@@ -303,7 +300,7 @@
                     end_index = end_index + 1;
                     start_index = end_index - count;
                 }
-                this.showPointData = this.caseData.slice(start_index, end_index)
+                this.showPageData = this.showSkillData.slice(start_index, end_index);
 
                 //   this.caseData = (this.caseData).slice((index * val), this.caseData.length)
                 this.currentPage = val
