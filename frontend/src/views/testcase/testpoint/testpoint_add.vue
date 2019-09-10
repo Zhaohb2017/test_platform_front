@@ -38,20 +38,20 @@
 
 
 
-        <el-form-item label="上传图片" prop="t_imgname">
-          <el-upload
-                  class="fileBtn"
-                  action="https://jsonplaceholder.typicode.com/posts/"
-                  name="t_imgname"
-                  accept="image/*"
-                  :on-preview="handlePreview"
-                  :on-remove="handleRemove"
-                  :on-success="getAvatarSuccess"
-                  :file-list="fileList"
-                  list-type="picture">
-            <el-button size="small" type="primary">点击上传</el-button>
-            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-          </el-upload>
+<!--        <el-form-item label="上传图片" prop="t_imgname">-->
+<!--          <el-upload-->
+<!--                  class="fileBtn"-->
+<!--                  action="https://jsonplaceholder.typicode.com/posts/"-->
+<!--                  name="t_imgname"-->
+<!--                  accept="image/*"-->
+<!--                  :on-preview="handlePreview"-->
+<!--                  :on-remove="handleRemove"-->
+<!--                  :on-success="getAvatarSuccess"-->
+<!--                  :file-list="fileList"-->
+<!--                  list-type="picture">-->
+<!--            <el-button size="small" type="primary">点击上传</el-button>-->
+<!--            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
+<!--          </el-upload>-->
 <!--          <el-upload-->
 <!--            class="avatar-uploader"-->
 <!--            action="https://jsonplaceholder.typicode.com/posts/"-->
@@ -62,7 +62,7 @@
 <!--            <i v-else class="el-icon-plus avatar-uploader-icon"></i>-->
 <!--          </el-upload>-->
 <!--          <el-input type="text" placeholder="请输入Bug导致的原因-询问开发人员" v-model="AddPointFrom.b_reason"></el-input>-->
-        </el-form-item>
+<!--        </el-form-item>-->
 
         <el-form-item label="入库装填" prop="t_storage">
           <el-radio-group v-model="AddPointFrom.t_storage">

@@ -19,7 +19,7 @@
             <el-input type="text" placeholder="请输入提交人信息" v-model="AddCaseForm.c_name"></el-input>
           </el-form-item>
           <el-form-item label="用户mid" prop="c_mid">
-            <el-input type="text" placeholder="输入用户mid" v-model="AddCaseForm.c_mid"></el-input>
+            <el-input type="text" placeholder="输入mid,例:[127843,127641,127854]" v-model="AddCaseForm.c_mid"></el-input>
           </el-form-item>
 
           <el-form-item label="测试目的" prop="c_purpose">
@@ -28,6 +28,37 @@
 
           <el-form-item label="创房选项" width="290" min-width="180" header-align="center" prop="c_options">
                 <el-card class="box-card">
+                    <div>
+                        <template>
+                            <span>创房类型选择：&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;</span>
+                            <template>
+                                <el-select v-model="AddCaseForm.c_options.roomTypeVuale" placeholder="请选择" @change="createRoomType">
+                                    <el-option
+                                            v-for="item in roomType"
+                                            :key="item.value"
+                                            :label="item.label"
+                                            :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </template>
+                        </template>
+                    </div>
+
+                    <div v-show="show_club_id">
+                        <span>俱乐部房间类型选择：</span>
+                        <el-input type="text" placeholder="请输入俱乐部ID" v-model="AddCaseForm.c_options.o_club_id"></el-input>
+                        <template>
+
+                            <el-select v-model="AddCaseForm.c_options.clubRoomTypeVuale" placeholder="请选择">
+                                <el-option
+                                        v-for="item in clubRoomType"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </template>
+                    </div>
                     <div>
                         <template>
                             <span>人数：</span>
@@ -70,7 +101,6 @@
                             <el-radio v-model="AddCaseForm.c_options.o_fengdinghuxi" label="300">300息</el-radio>
                         </template>
                     </div>
-
 
 
                     <div>
@@ -129,19 +159,59 @@
           <el-form-item label="牌型数据" prop="c_cards">
             <el-input type="textarea" autosize placeholder="请输入牌型数据" v-model="AddCaseForm.c_cards"></el-input>
           </el-form-item>
-
-          <el-form-item label="操作步骤" prop="c_steps">
-
-
-             <el-input type="textarea" autosize placeholder="请输入操作步骤" v-model="AddCaseForm.c_steps"></el-input>
-          </el-form-item>
-
-
+            
           <el-form-item label="备注" prop="c_remake">
             <el-input type="text" placeholder="请输入额外补充内容" v-model="AddCaseForm.c_remake"></el-input>
           </el-form-item>
 
         </el-form>
+        <el-form :model="operationForm"
+                   ref="operationForm"
+                   label-width="130px"
+                   center
+                   size="small">
+              <el-form-item label="测试步骤"  prop="servin" >
+                  <el-button type="primary" @click="addRow(operationList)">新增</el-button>
+                  <template>
+                      <el-table border :data="operationList" style="width: 100%" >
+                          <el-table-column prop="user" label="玩家" style="width:6vw;" >
+                              <template slot-scope="scope">
+                                  <el-select v-model="scope.row.users" clearable  >
+                                      <el-option
+                                              v-for="item in users"
+                                              :key="item.value"
+                                              :label="item.text"
+                                              :value="item.value">
+                                      </el-option>
+                                  </el-select>
+                              </template>
+                          </el-table-column>
+                          <el-table-column  prop="operation" label="类型">
+                              <template slot-scope="scope">
+                                  <el-select v-model="scope.row.operation" clearable  >
+                                      <el-option
+                                              v-for="item in operation_type"
+                                              :key="item.value"
+                                              :label="item.text"
+                                              :value="item.value">
+                                      </el-option>
+                                  </el-select>
+                              </template>
+                          </el-table-column>
+                          <el-table-column prop="card" label="牌">
+                              <template slot-scope="scope">
+                                  <el-input size="mini" v-model="scope.row.card"  ></el-input>
+                              </template>
+                          </el-table-column>
+                          <el-table-column fixed="right"  label="操作">
+                              <template slot-scope="scope">
+                                  <el-button @click.native.prevent="deleteRow(scope.$index, operationList)" size="small"> 移除 </el-button>
+                              </template>
+                          </el-table-column>
+                      </el-table>
+                  </template>
+              </el-form-item>
+          </el-form>
         <el-alert v-if="re_data != ''" type="error">{{ re_data }}</el-alert>
 
         <span slot="footer" class="dialog-footer">
@@ -217,8 +287,18 @@ import axios from 'axios'
         doublePlusNewShowFlag:false,
         // 添加新的翻倍积分标记
          doublePlusNewShowFlag:false,
-
-
+        show_club_id:false,
+        roomType:[{text:'普通创房',value:'普通创房'},{text:'俱乐部创房',value:'俱乐部创房'}],
+        clubRoomType:[{text:'金币创房',value:'金币创房'}],
+          operationForm:{},
+          operationList:[],
+          users:[{text:'玩家1',value:'玩家1'},{text:'玩家2',value:'玩家2'},{text:'玩家3',value:'玩家3'}],
+          operation_type:[{text:'胡牌',value:'胡牌'},
+              {text:'碰牌',value:'碰牌'},
+              {text:'吃牌',value:'吃牌'},
+              {text:'出牌',value:'出牌'},
+              {text:'过牌',value:'过牌'},
+          ],
         AddCaseForm: {
           c_project: '超越项目组',
           c_version: '主版本',
@@ -239,11 +319,15 @@ import axios from 'axios'
               o_integral: '',
               o_NoShow_dipai:false, //不显示底牌
               o_fengdinghuxi:"",    //封顶胡息
-              o_double:"",           //加倍
+              o_double:0,           //加倍
               o_fanbei:"",          //翻倍数据
               o_doubleNew: false,   //新的翻倍
               o_double_score:"",    //加倍低于多少分加倍
               o_jiachui: '',
+              o_double_plus:0,      //番倍
+              roomTypeVuale:"普通创房",
+              clubRoomTypeVuale:'',
+              o_club_id:'',
           },
           c_steps: '',
           c_cards: '',
@@ -302,13 +386,31 @@ import axios from 'axios'
       handleClose(done) {
         this.Closeed();
       },
-
+        createRoomType(val){
+            console.log("xxxxxxx",val);
+            if(val=="俱乐部创房"){
+                this.show_club_id = true;
+            }else{
+                this.show_club_id = false;
+                this.AddCaseForm.c_options.clubRoomTypeVuale = '';
+                this.AddCaseForm.c_options.o_club_id = '';
+            }
+        },
+        addRow(tableData,event){
+            tableData.push({users: '',operation:'', card:''})
+        },
+        deleteRow(index, rows){
+            ////删除改行
+            rows.splice(index, 1);
+        },
         // 加倍选项判断
        double(val){
            if(val==1){
                this.doubleShowFlag = true;
            }else {
                this.doubleShowFlag = false;
+               this.doublePlusNewShowFlag = false;
+               this.AddCaseForm.c_option.o_double_plus_new = false;
            }
        },
 
@@ -331,6 +433,7 @@ import axios from 'axios'
               this.ShowFlag = true;
           }else{
               this.ShowFlag = false;
+              this.doublePlusNewShowFlag = false;
           }
       },
         // 添加新的翻倍积分选项
@@ -365,10 +468,6 @@ import axios from 'axios'
                 return
               }
 
-              if(this.AddCaseForm.c_steps == ''){
-                this.$message.error("操作步骤不能为空.")
-                return
-              }
 
               let that = this;
               if(this.AddCaseForm.c_options.o_player == 3){
@@ -379,14 +478,14 @@ import axios from 'axios'
                     '胡一等': this.AddCaseForm.c_options.o_huyideng,
                 }
               }else{
-                options["牌数"] = this.AddCaseForm.c_options.o_card_num
+                options = this.AddCaseForm.c_options
               }
 
               if(this.AddCaseForm.c_options.o_wanfa != ""){
                 options["玩法"] = this.AddCaseForm.c_options.o_wanfa
               }
 
-              console.log("玩法选项"+options)
+              console.log("玩法选项"+options);
 
               
               axios({
@@ -399,17 +498,23 @@ import axios from 'axios'
                       c_account:this.AddCaseForm.c_mid,
                       c_purpose: this.AddCaseForm.c_purpose,
                       c_remake: this.AddCaseForm.c_remake,
-                      c_steps: this.AddCaseForm.c_steps,
+                      c_steps: this.operationList,
                       c_project: this.AddCaseForm.c_project + '-' + this.AddCaseForm.c_version,
                       c_play: this.AddCaseForm.c_play,
                       c_options: options,
                   }
                }).then(function(resp){
-                    that.$refs['AddCaseForm'].resetFields()
-                    that.re_data = resp.data
-                    setTimeout(() => {
-                      that.$emit("reload")
-                    }, 800);
+                  if (resp.data["code"]==300){
+                      alert(resp.data["Msg"])
+                  }else {
+                      that.$refs['AddCaseForm'].resetFields();
+                      alert(resp.data);
+                      that.re_data = resp.data;
+                      setTimeout(() => {
+                          that.$emit("reload")
+                      }, 800);
+
+                  }
                }).catch(resp => {
                     that.re_data = resp.data
                });

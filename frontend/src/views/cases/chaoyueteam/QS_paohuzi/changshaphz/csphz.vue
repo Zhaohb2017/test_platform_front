@@ -11,7 +11,6 @@
             <AddBugs :visible.sync="show_flag" v-if="show_flag" @reload="reload"></AddBugs>
         </div>
 
-
         <!-- 展示列表 -->
         <el-table
                 :data="showcaseData"
@@ -44,17 +43,18 @@
 
             <el-table-column label="提交人" width="100" prop="c_name" header-align="center" align="center">
             </el-table-column>
-
+            <el-table-column label="用户mid" width="100" prop="c_mid" header-align="center" align="center">
+            </el-table-column>
             <el-table-column label="测试目的" width="190" header-align="center" align="center" prop="c_purpose">
             </el-table-column>
 
-            <el-table-column label="创房选项" width="290" min-width="180" header-align="center" prop="c_option">
+            <el-table-column label="创房选项" width="290" min-width="180" header-align="center" prop="c_RoomOptions">
             </el-table-column>
 
             <el-table-column label="做牌数据" width="290" min-width="180" header-align="center" prop="c_cards">
             </el-table-column>
 
-            <el-table-column label="操作步骤" width="290" min-width="180" header-align="center" prop="c_operate">
+            <el-table-column label="操作步骤" width="290" min-width="180" header-align="center" prop="c_step">
             </el-table-column>
 
             <el-table-column label="备注" width="130" align="center" prop="c_remake">
@@ -221,13 +221,16 @@
                     params: {
                         'c_project':'超越项目组',
                         'c_version':'主版本',
-                        'c_play':"长沙跑胡子",
+                        'c_play':'长沙跑胡子'
                     }
                 }).then(function(resp){
                     that.caseData = resp.data.sort();
-                    that.showcaseData = that.caseData.slice(0, that.current_page_size)
-                    console.log("showcaseData: ", that.showcaseData)
+                    that.showcaseData = that.caseData.slice(0, that.current_page_size);
+                    for (var i in that.showcaseData){
+                        that.showcaseData[i]["c_step"] = JSON.stringify(that.showcaseData[i]["c_operate"]); //操作步骤
+                        that.showcaseData[i]["c_RoomOptions"] = JSON.stringify(that.showcaseData[i]["c_option"]) //创房选项
 
+                    }
                 }).catch(resp => {
                     console.log('请求失败：'+resp.status+','+resp.statusText);
                 });
@@ -237,18 +240,15 @@
             ChangeAddFlag() {
                 this.show_flag = true;
             },
-
             //修改修改Bug实例弹窗显示状态
             ChangeEditFlag(row){
                 if(this.$store.state.user != null){
-                    let new_data = JSON.parse(JSON.stringify(row))
-                    new_data.c_option = eval('('+ row.c_option.replace("人数", "o_player").replace("局数", "o_round").replace("胡一等", "o_huyideng").replace("牌数", "o_card_num").replace("玩法", "o_wanfa") +')')
-                    this.current_data = new_data
+                    let new_data = JSON.parse(JSON.stringify(row));
+                    this.current_data = new_data;
                     this.edit_show_flag = true;
                 }else{
                     this.$message.error("请先登录.")
                 }
-
             },
 
 
@@ -285,7 +285,7 @@
                     let c_id = row['c_id']
                     let that = this;
 
-                    // that.isRunning = row.c_id
+                    that.isRunning = row.c_id;
                     that.$message.success("用例正在运行.")
                     axios({
                         method:'get',

@@ -40,7 +40,7 @@
 
             <el-table-column header-align="center" label="操作" align="center">
                 <template slot-scope="scope">
-                    <el-button size="mini" type="text" @click="handleDelete(scope.$index,scope.row)">删除</el-button>
+                    <el-button size="mini" type="danger" @click="handleDelete(scope.$index,scope.row)" icon="el-icon-delete" circle></el-button>
                 </template>
             </el-table-column>
 
@@ -63,7 +63,7 @@
             </el-pagination>
         </div>
 
-        <EditSkills :visible.sync="edit_show_flag" v-if="edit_show_flag" :current_data="current_data" @reload="reload"></EditSkills>
+        <EditSkills :visible.sync="edit_show_flag" v-if="edit_show_flag" :current_data="current_data" @reload="reload" ></EditSkills>
 
     </div>
 </template>

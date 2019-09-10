@@ -1,7 +1,7 @@
 <template>
     <div v-if="add_visible" class="lg">
         <el-dialog
-                title="添加测试用例 - 常德跑胡子"
+                title="添加测试用例 - 跑得快15张"
                 width="40%"
                 center
                 :show-close = "false"
@@ -10,16 +10,18 @@
                 :visible="true">
 
             <el-form ref="AddCaseForm" :model="AddCaseForm" :rules='addrules' label-width="80px">
-
                 <el-form-item label="日 期" prop="c_date">
-                    <el-date-picker type="date" style="width: 100%;" placeholder="选择日期" v-model="AddCaseForm.c_date"></el-date-picker>
+                    <el-date-picker type="datetime"
+                                    style="width: 100%;"
+                                    placeholder="选择日期"
+                                    v-model="AddCaseForm.c_date"></el-date-picker>
                 </el-form-item>
 
                 <el-form-item label="提 交 人" prop="c_name">
                     <el-input type="text" placeholder="请输入提交人信息" v-model="AddCaseForm.c_name"></el-input>
                 </el-form-item>
                 <el-form-item label="用户mid" prop="c_mid">
-                    <el-input type="text" placeholder="请输入用户mid" v-model="AddCaseForm.c_mid"></el-input>
+                    <el-input type="text" placeholder="输入mid,例:[127843,127641,127854]" v-model="AddCaseForm.c_mid"></el-input>
                 </el-form-item>
 
                 <el-form-item label="测试目的" prop="c_purpose">
@@ -37,58 +39,79 @@
                                 </el-radio-group>
                             </template>
                         </div>
-                        <!-- 2人玩法选项-->
-                        <div v-show="ShowFlag">
+                        <div>
                             <template>
-                                <span>抽牌：</span>
-                                <el-radio v-model="AddCaseForm.c_options.o_card_num" label='抽牌20张'>抽牌20张</el-radio>
-                                <el-radio v-model="AddCaseForm.c_options.o_card_num" label='抽牌10张'>抽牌10张</el-radio>
-                                <el-radio v-model="AddCaseForm.c_options.o_card_num" label='不抽底牌'>不抽底牌</el-radio>
+                                <div v-show="ShowFlag">
+                                    <span>积分加倍：</span>
+                                    <el-radio-group v-model="AddCaseForm.c_options.o_double" @change="double">
+                                        <el-radio :label=1>加倍</el-radio>
+                                        <el-radio :label=0>不加倍</el-radio>
+                                    </el-radio-group>
+                                </div>
                             </template>
                         </div>
 
+                        <div v-show="doubleShowFlag">
+                            <!-- 5分倍数加倍分输入                           -->
+                            <template>
+                                <el-input type="textarea" autosize placeholder="请输入5的倍数分" v-model="AddCaseForm.c_options.o_double_score"></el-input>
+                            </template>
+                            <!--    翻倍玩法    -->
+                            <template>
+                                <span>翻倍：</span>
+                                <el-radio-group v-model="AddCaseForm.c_options.o_double_plus" >
+                                    <el-radio :label=2>翻2倍</el-radio>
+                                    <el-radio :label=3>翻3倍</el-radio>
+                                    <el-radio :label=4>翻4倍</el-radio>
+                                </el-radio-group>
+                                <el-checkbox v-model="AddCaseForm.c_options.o_double_plus_new" :label=5 @change="doublePlusNew">添加新的翻倍</el-checkbox>
+                            </template>
+                        </div>
+                        <div v-show="doublePlusNewShowFlag">
+                            <!-- 添加新的翻倍选项 -->
+                            <template>
+                                <span>请设置新的翻倍积分： 5 分 至</span>
+                                <el-input-number v-model="AddCaseForm.c_options.o_doublePlusNewScore"
+                                                 @change="handleChange"
+                                                 :min="5"
+                                                 :max="100"
+                                                 label="添加翻倍分数"
+                                                 :step="5"
+                                                 controls="true"></el-input-number><br>
+                            </template>
+                            <template>
 
-                        <!-- 玩法   -->
+                                <span>请设置新的翻倍数：</span>
+                                <el-radio-group v-model="AddCaseForm.c_options.o_double_plus" >
+                                    <el-radio :label=2>翻2倍</el-radio>
+                                    <el-radio :label=3>翻3倍</el-radio>
+                                    <el-radio :label=4>翻4倍</el-radio>
+                                </el-radio-group>
+
+                            </template>
+                        </div>
+
+                        <div>
+                            <template>
+                                <span>局数：</span>
+                                <el-radio v-model="AddCaseForm.c_options.o_round" :label=5>5局</el-radio>
+                                <el-radio v-model="AddCaseForm.c_options.o_round" :label=10>10局</el-radio>
+                                <el-radio v-model="AddCaseForm.c_options.o_round" :label=15>15局</el-radio>
+                                <el-radio v-model="AddCaseForm.c_options.o_round" :label=20>20局</el-radio>
+                            </template>
+                        </div>
+
                         <div>
                             <template>
                                 <span>玩法：</span>
-                                <el-radio v-model="AddCaseForm.c_options.o_mingtang" label='全名堂'>全名堂</el-radio>
-                                <el-radio v-model="AddCaseForm.c_options.o_mingtang" label='红黑点'>红黑点</el-radio>
-                                <el-radio v-model="AddCaseForm.c_options.o_mingtang" label='多红对'>多红对</el-radio>
-                                <el-checkbox v-model="AddCaseForm.c_options.o_mingwei" :label=2>明偎</el-checkbox>
+                                <el-checkbox v-model="AddCaseForm.c_options.o_showCard" :label=512>显示剩余牌</el-checkbox>
+                                <el-checkbox v-model="AddCaseForm.c_options.o_zhuaNiao" :label=512>红桃10抓鸟</el-checkbox>
+                                <el-checkbox v-model="AddCaseForm.c_options.o_outBig" :label=512>有大必出</el-checkbox>
+                                <el-checkbox v-model="AddCaseForm.c_options.o_nonSeparability" :label=512>炸弹不可拆</el-checkbox>
+                                <el-checkbox v-model="AddCaseForm.c_options.o_gaiPai" :label=512>首轮盖牌</el-checkbox>
+                                <el-checkbox v-model="AddCaseForm.c_options.o_outThree" :label=512>首局先出黑桃3</el-checkbox>
                             </template>
                         </div>
-                        <div>
-                            <template>
-                                <span>底分：</span>
-                                <el-radio v-model="AddCaseForm.c_options.o_difen" label='1'>底分1分</el-radio>
-                                <el-radio v-model="AddCaseForm.c_options.o_difen" label='2'>底分2分</el-radio>
-                                <el-radio v-model="AddCaseForm.c_options.o_difen" label='3'>底分3分</el-radio>
-                                <el-radio v-model="AddCaseForm.c_options.o_difen" label='4'>底分4分</el-radio>
-                                <el-radio v-model="AddCaseForm.c_options.o_difen" label='5'>底分5分</el-radio>
-
-                            </template>
-                        </div>
-                        <div >
-                            <template>
-                                <span>局数：</span>
-                                <el-radio v-model="AddCaseForm.c_options.o_round" label='6'>6局</el-radio>
-                                <el-radio v-model="AddCaseForm.c_options.o_round" label='8'>8局</el-radio>
-                                <el-radio v-model="AddCaseForm.c_options.o_round" label='10'>10局</el-radio>
-                                <el-radio v-model="AddCaseForm.c_options.o_round" label='16'>16局</el-radio>
-                            </template>
-                        </div>
-                        <div >
-                            <template>
-                                <span>封顶：</span>
-                                <el-radio v-model="AddCaseForm.c_options.o_fengding" label=''>不封顶</el-radio>
-                                <el-radio v-model="AddCaseForm.c_options.o_fengding" label='100'>100封顶</el-radio>
-                                <el-radio v-model="AddCaseForm.c_options.o_fengding" label='200'>200封顶</el-radio>
-                                <el-radio v-model="AddCaseForm.c_options.o_fengding" label='300'>300封顶</el-radio>
-
-                            </template>
-                        </div>
-
 
                     </el-card>
                 </el-form-item>
@@ -99,6 +122,7 @@
 
                 <el-form-item label="操作步骤" prop="c_steps">
                     <el-input type="textarea" autosize placeholder="请输入操作步骤" v-model="AddCaseForm.c_steps"></el-input>
+
                 </el-form-item>
 
 
@@ -161,9 +185,6 @@
     .box-card {
         width: 100%;
     }
-    .el-input-number{
-
-    }
 
 </style>
 
@@ -180,13 +201,11 @@
 
                 // 创房选项二人时显示抽牌标记位
                 ShowFlag: false,
-                // 创房间选项时3人显示
-                threePeople: false,
-
+                doubleShowFlag:false,
                 AddCaseForm: {
                     c_project: '超越项目组',
                     c_version: '主版本',
-                    c_play: '常德跑胡子',
+                    c_play: '跑得快15张',
                     c_date: '',
                     c_name: '',
                     c_mid:"",
@@ -194,21 +213,17 @@
                     c_options: {
                         o_player: 3,
                         o_round: 10,
-                        o_huyideng: '5息一囤',
-                        o_jiachui: '',
-                        o_card_num: '抽牌20张',
-                        o_wanfa: '',
+                        o_showCard:true,
+                        o_zhuaNiao:false,
+                        o_outBig:true,
+                        o_nonSeparability:true,
+                        o_gaiPai:false,
+                        o_outThree:true,
+                        o_double_plus_new:false,
+                        o_double:0,
 
-                        o_mingwei: '',             //明偎
-                        o_mingtang:'多红对',    //名堂
-                        o_difen:'1',           //底分
-                        o_jushu:'6',           //局数
-                        o_wanfa: '',            //玩法
-                        o_fengding:'100',
-
-                        o_jiachui: '',
-                       
                     },
+
                     c_steps: '',
                     c_cards: '',
                     c_remake: '',
@@ -280,18 +295,9 @@
             getValue(val){
                 if(val==2){
                     this.ShowFlag = true;
-                    this.threePeople= false;
                 }else{
-                    this.ShowFlag= false;
-                    this.threePeople= true;// 3人玩法标记
-                }
-            },
-            // 加倍选项判断
-            double(val){
-                if(val==1){
-                    this.doubleShowFlag = true;
-                }else {
-                    this.doubleShowFlag = false;
+                    this.ShowFlag = false;
+                    this.doublePlusNewShowFlag = false;
                 }
             },
             // 添加新的翻倍积分选项
@@ -302,9 +308,16 @@
                     this.doublePlusNewShowFlag = false;
                 }
             },
-            // 添加新的积分翻倍
-            handleChange(){},
-
+            // 加倍选项判断
+            double(val){
+                if(val==1){
+                    this.doubleShowFlag = true;
+                }else {
+                    this.doubleShowFlag = false;
+                    this.AddCaseForm.c_options.o_double_plus_new = 0;
+                    this.doublePlusNewShowFlag = false;
+                }
+            },
             AddCase(){
                 if(this.$store.state.user != null){
                     if(this.AddCaseForm.c_date == ''){
@@ -334,40 +347,26 @@
                     }
 
                     let that = this;
-                    if(this.AddCaseForm.c_options.o_player == 3){
-                        var options = {
-                            '人数': this.AddCaseForm.c_options.o_player,
-                            '局数': this.AddCaseForm.c_options.o_round,
-                            '胡一等': this.AddCaseForm.c_options.o_huyideng,
-                        }
-                    }else{
-                        options["牌数"] = this.AddCaseForm.c_options.o_card_num
-                    }
-
-                    if(this.AddCaseForm.c_options.o_wanfa != ""){
-                        options["玩法"] = this.AddCaseForm.c_options.o_wanfa
-                    }
-
-                    console.log(options)
-
                     axios({
+
                         method:'post',
                         url:'/api/cases/c_add',
                         data: {
                             c_cards: this.AddCaseForm.c_cards,
                             c_date: this.AddCaseForm.c_date,
-                            c_account: this.AddCaseForm.c_mid,
                             c_name: this.AddCaseForm.c_name,
                             c_purpose: this.AddCaseForm.c_purpose,
                             c_remake: this.AddCaseForm.c_remake,
                             c_steps: this.AddCaseForm.c_steps,
+                            c_account:this.AddCaseForm.c_mid,
                             c_project: this.AddCaseForm.c_project + '-' + this.AddCaseForm.c_version,
                             c_play: this.AddCaseForm.c_play,
-                            c_options: options,
+                            c_options: this.AddCaseForm.c_options,
                         }
                     }).then(function(resp){
-                        that.$refs['AddCaseForm'].resetFields()
-                        that.re_data = resp.data
+                        that.$refs['AddCaseForm'].resetFields();
+                        alert(resp,data);
+                        // that.re_data = resp.data;
                         setTimeout(() => {
                             that.$emit("reload")
                         }, 800);

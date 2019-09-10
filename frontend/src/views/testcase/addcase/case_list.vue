@@ -6,44 +6,43 @@
             <h3>用例仓库</h3>
             <el-button type="danger" @click="getTestCaseList">刷新数据</el-button>
             <el-button type="danger" @click="ChangeAddFlag" >添加用例</el-button>
-            <el-input type="text" prefix-icon="el-icon-search" required style="width:200px;" v-model="search_data" placeholder="支持模糊查询"></el-input>
+            <el-input type="text" prefix-icon="el-icon-search" required style="width:260px;" v-model="search_data" placeholder="支持版本,模块,测试点模糊查询"></el-input>
             <el-button type="primary" @click="Search" >搜索</el-button>
-            <input type="file" ref="upload" accept=".xls,.xlsx" @change="readExcel" placeholder="file"></input>
-            <el-button type="primary" @click="batchProduce" size="small" round>批量生成<i class="el-icon-download el-icon--right"></i></el-button>
+            <input type="file" class="case"  ref="upload" accept=".xls,.xlsx" @change="readExcel" placeholder="file"></input>
+            <el-button type="primary" @click="batchProduce" size="small" round>批量上传<i class="el-icon-download el-icon--right"></i></el-button>
             <el-button type="primary" @click="downloadExcel" size="small" round>下载数据<i class="el-icon-upload2 el-icon--right"></i></el-button>
+<!--            <el-button type="danger" style="float: right;" size="small" @click="deletePageData" plain>全删</el-button>-->
             <Addknowledge :visible.sync="show_flag" v-if="show_flag" @reload="reload"></Addknowledge>
         </div>
        <!-- 展示列表  -->
-        <el-scrollbar class="page-scroll" style="height: 100%">
+        <el-scrollbar class="page-scroll" style="height:100%; width: 86%" >
             <div>
                 <el-table
                         :data="showPageData"
-                        style="width: 100%"
+                        style="width: 100%; height: 100%;"
                         border
                         :row-class-name="tableRowClassName"
                         :header-cell-style="{background: '#F5F5F5'}"
                         :default-sort = "{prop: 'c_date', order: 'ascending'}">
-                    <el-table-column prop="c_id" v-if="false">
+                    <el-table-column label="版本" width="110" min-width="110" header-align="center" prop="t_versions" >
                     </el-table-column>
-                    <el-table-column label="版本" width="100" min-width="180" header-align="center" prop="t_versions">
+                    <el-table-column label="模块" width="110" min-width="110" header-align="center" prop="t_module">
                     </el-table-column>
-                    <el-table-column label="模块" width="100" min-width="180" header-align="center" prop="t_module">
+                    <el-table-column label="测试点" width="180" min-width="180" header-align="center" prop="t_testpointVal">
                     </el-table-column>
-                    <el-table-column label="测试点" width="100" min-width="180" header-align="center" prop="t_testpointVal">
+                    <el-table-column label="前置条件" width="217" min-width="217" header-align="center" prop="t_precondition">
                     </el-table-column>
-                    <el-table-column label="前置条件" width="100" min-width="180" header-align="center" prop="t_precondition">
+                    <el-table-column label="操作步骤" width="305" min-width="305" header-align="center" prop="t_step">
                     </el-table-column>
-                    <el-table-column label="操作步骤" width="400" min-width="180" header-align="center" prop="t_step">
+                    <el-table-column label="预期结果" width="213" min-width="213" header-align="center" prop="t_expectedResult">
                     </el-table-column>
-                    <el-table-column label="预期结果" width="200" min-width="180" header-align="center" prop="t_expectedResult">
+                    <el-table-column label="实际结果" width="199" min-width="199" header-align="center" prop="t_actualResults">
                     </el-table-column>
-                    <el-table-column label="实际结果" width="200" min-width="180" header-align="center" prop="t_actualResults">
+                    <el-table-column label="是否通过" width="50" min-width="50" header-align="center" prop="t_pass">
                     </el-table-column>
-                    <el-table-column label="是否通过" width="50" min-width="180" header-align="center" prop="t_pass">
+                    <el-table-column label="是否有效" width="50" min-width="50" header-align="center" prop="t_effective">
                     </el-table-column>
-                    <el-table-column label="是否有效" width="50" min-width="180" header-align="center" prop="t_effective">
-                    </el-table-column>
-                    <el-table-column label="备注" width="160" min-width="180" header-align="center" prop="t_remark">
+                    <el-table-column label="备注" width="100" min-width="100" header-align="center" prop="t_remark">
                     </el-table-column>
                     <el-table-column header-align="center" label="操作" align="center">
                         <template slot-scope="scope">
@@ -54,22 +53,21 @@
 
                 </el-table>
             </div>
-            <!-- 分页 -->
-            <div class="block">
-                <el-pagination
-                        @size-change="handleSizeChange"
-                        @current-change="handleCurrentChange"
-                        :current-page="currentPage"
-                        :page-sizes="page_sizes_data"
-                        :page-size="current_page_size"
-                        background
-                        layout="total, sizes, prev, pager, next, jumper"
-                        :total="caseData.length">
-                </el-pagination>
-            </div>
+
         </el-scrollbar>
-
-
+        <!-- 分页 -->
+        <div class="pageblock" >
+            <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="currentPage"
+                    :page-sizes="page_sizes_data"
+                    :page-size="current_page_size"
+                    background
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="caseData.length">
+            </el-pagination>
+        </div>
         <Edit :visible.sync="edit_show_flag" v-if="edit_show_flag" :current_data="current_data" @reload="reload"></Edit>
 
     </div>
@@ -77,21 +75,23 @@
 </template>
 
 <style lang="less" scoped>
+    #orderFullScreen{
+      overflow-y: auto;
+    }
+
+    .table-title{
+        background-color:#fa0000;
+    }
+
     .page-scroll{
         height: 100%;
         overflow-x: hidden;
-        position: absolute;
+         position: absolute;
+
     }
 
     .bugs{
         margin: 1%;
-    /*    height: 100%;*/
-    /*    position: absolute;*/
-    /*    top: 0;*/
-    /*    right: 0;*/
-    /*    bottom: 0;*/
-    /*    left: 0;*/
-    /*    overflow: auto;*/
     }
 
     .head{
@@ -103,6 +103,16 @@
         white-space: pre-line;
     }
 
+    .case{
+        margin-left: 2%;
+        outline-style: none ;
+        padding: 13px 14px;
+        width: 12%;
+        font-size: 14px;
+        font-weight: 700;
+        font-family: "Microsoft soft";
+    }
+
     .el-tag{
         border: none;
         background-color:transparent;
@@ -110,15 +120,22 @@
 
     .el-table{
         text-align: center;
+        overflow-y: auto;
     }
 
     .el-table .success-row {
         background: #f0f9eb;
     }
 
-    .block{
-        margin-top: 1%;
+    .pageblock{
+        margin-top: 5%;
         text-align: center;
+        position:fixed; //固定底部
+        bottom:0;       //固定底部
+        height: 50px;
+        width: 100px;
+        left:40%;
+        right: 0;
     }
 
     // bug类别说明样式
@@ -149,7 +166,6 @@
             Edit,
             exportExcelCommon
         },
-
         data() {
             return {
 
@@ -159,7 +175,6 @@
 
                 outputs: [],
                 t_info: [],
-
 
                 // 搜索内容
                 search_data: "",
@@ -176,7 +191,7 @@
                 report_current_data: [],
 
                 //  页面页数选择
-                page_sizes_data: [5, 10],
+                page_sizes_data: [5,10],
                 // 当前页面
                 currentPage: 1,
                 // 当前页面展示数据
@@ -190,7 +205,8 @@
 
                 // 当前初始的index
                 start_index: 0,
-
+                //删除page数据
+                deletedata:[],
                 // 结束展示的index
                 end_index: 0,
 
@@ -200,13 +216,19 @@
 
         mounted: function(){
             this.getTestCaseList();
-            document.getElapsedTime("page-scroll").addEventListener('scroll', this.handleScroll)
+
         },
 
         methods: {
-            // 获取滚动条高度
-            handleScroll(){
-                console.log(document.getElementById('page-scroll').scrollTop)
+            //监听浏览器
+            onresize(){
+                window.onresize = () => {
+                    return (() =>{
+                        window.fullHeight = document.documentElement.clientHeight;
+                        _this.fullHeight = window.fullHeight;
+                        _this.setPaginationStyle()
+                    })()
+                }
             },
 
             reload(){
@@ -248,14 +270,7 @@
                         that.excelData = ws;
                         console.log(ws,typeof ws);
 
-                        // that.outputs = []; // 清空接收数据
-                        // for (let i = 0; i < ws.length; i++) {
-                        //     console.log("读取数据："+ws[i]);
-                        //     let sheetData = ws[i];// 对数据自行操作
-                        //     that.outputs.push(sheetData)
-                        // }
-                        // console.log("表数据："+that.outputs);
-                        // this.$refs.upload.value = ''
+
                     }catch (e) {
                         console.log("error: "+e);
                         return false
@@ -272,7 +287,7 @@
                     return
                 }
                 var jsonData = JSON.parse(JSON.stringify(this.excelData));
-                console.log(3333333333333333333,jsonData);
+
                 axios({
                     method:'post',
                     url:'/api/knowledge/excel_data',
@@ -288,6 +303,37 @@
                     console.log('请求失败：'+resp.status+','+resp.statusText);
                 });
             },
+            //删除当前页面所有数据
+            deletePageData(){
+                let that = this;
+                this.$confirm('确定删除当前页所有数据?', '提示',{
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }
+                ).then(() =>{
+                    const delete_data = JSON.parse(JSON.stringify(that.showPageData));
+                    for(var i in delete_data){
+                        that.deletedata.push(delete_data[i]["t_id"])
+                    }
+                    let ToStr = JSON.stringify(that.deletedata);
+                    axios({
+                        method:"get",
+                        url:'/api/knowledge/page_delete',
+                        params:{
+                            "id":ToStr
+                        }
+                    }).then(function (resp) {
+                        console.log('page删除返回数据 :'+resp.data);
+                        that.getTestCaseList()
+
+                    }).catch(resp => {
+                        console.log('请求失败：'+resp.status+','+resp.statusText);
+                    })
+                }).catch(() => {
+
+                })
+            },
 
             downloadExcel(){
                 console.log("我来导出数据了");
@@ -300,9 +346,7 @@
                     this.excelDownloadData = this.caseData; //你要导出的数据list。
                     this.export2Excel()
                 }).catch(() =>{
-
                 })
-
             },
             //数据写入excel
             export2Excel() {
@@ -314,12 +358,11 @@
                     const list = that.excelDownloadData;
                     console.log("写入数据："+list);
                     const data = that.formatJson(filterVal, list);
-
                     console.log("xxxxxxxxxxxx",data);
                     export_json_to_excel(tHeader, data, '测试用例数据');// 导出的表格名称，根据需要自己命名
                 })
             },
-            //格式转换，直接复制即可
+            //格式转换
             formatJson(filterVal, jsonData) {
                 return jsonData.map(v => filterVal.map(j => v[j]))
 
@@ -380,9 +423,7 @@
                 }else{
                     this.$message.error("请先登录.")
                 }
-
             },
-
 
 
             Search(){
@@ -394,15 +435,13 @@
                         'data': that.search_data
                     }
                 }).then(function(resp){
-                    that.showSkillData = resp.data.sort();
-                    that.showPageData = that.showSkillData.slice(0, that.current_page_size);
+                    that.caseData = resp.data.sort();
+                    that.showPageData = that.caseData.slice(0, that.current_page_size);
 
                 }).catch(resp => {
                     console.log('请求失败：'+resp.status+','+resp.statusText);
                 });
-
             },
-
 
             tableRowClassName({row, rowIndex}) {
                 if (rowIndex % 2 === 1) {

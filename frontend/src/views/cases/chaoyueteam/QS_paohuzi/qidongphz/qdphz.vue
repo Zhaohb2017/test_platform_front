@@ -44,17 +44,19 @@
 
             <el-table-column label="提交人" width="100" prop="c_name" header-align="center" align="center">
             </el-table-column>
+            <el-table-column label="用户mid" width="100" prop="c_mid" header-align="center" align="center">
+            </el-table-column>
 
             <el-table-column label="测试目的" width="190" header-align="center" align="center" prop="c_purpose">
             </el-table-column>
 
-            <el-table-column label="创房选项" width="290" min-width="180" header-align="center" prop="c_option">
+            <el-table-column label="创房选项" width="290" min-width="180" header-align="center" prop="c_RoomOptions">
             </el-table-column>
 
             <el-table-column label="做牌数据" width="290" min-width="180" header-align="center" prop="c_cards">
             </el-table-column>
 
-            <el-table-column label="操作步骤" width="290" min-width="180" header-align="center" prop="c_operate">
+            <el-table-column label="操作步骤" width="290" min-width="180" header-align="center" prop="c_step">
             </el-table-column>
 
             <el-table-column label="备注" width="130" align="center" prop="c_remake">
@@ -225,8 +227,13 @@
                     }
                 }).then(function(resp){
                     that.caseData = resp.data.sort();
-                    that.showcaseData = that.caseData.slice(0, that.current_page_size)
-                    console.log("showcaseData: ", that.showcaseData)
+                    that.showcaseData = that.caseData.slice(0, that.current_page_size);
+                    for (var i in that.showcaseData){
+                        console.log("FFFFFF: ", that.showcaseData[i]["c_operate"],JSON.stringify(that.showcaseData[i]["c_operate"]));
+                        that.showcaseData[i]["c_step"] = JSON.stringify(that.showcaseData[i]["c_operate"]); //操作步骤
+                        that.showcaseData[i]["c_RoomOptions"] = JSON.stringify(that.showcaseData[i]["c_option"]) //创房选项
+
+                    }
 
                 }).catch(resp => {
                     console.log('请求失败：'+resp.status+','+resp.statusText);
@@ -241,14 +248,12 @@
             //修改修改Bug实例弹窗显示状态
             ChangeEditFlag(row){
                 if(this.$store.state.user != null){
-                    let new_data = JSON.parse(JSON.stringify(row))
-                    new_data.c_option = eval('('+ row.c_option.replace("人数", "o_player").replace("局数", "o_round").replace("胡一等", "o_huyideng").replace("牌数", "o_card_num").replace("玩法", "o_wanfa") +')')
-                    this.current_data = new_data
+                    let new_data = JSON.parse(JSON.stringify(row));
+                    this.current_data = new_data;
                     this.edit_show_flag = true;
                 }else{
                     this.$message.error("请先登录.")
                 }
-
             },
 
 

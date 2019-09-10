@@ -11,19 +11,32 @@
 
             <el-form ref="AddCardFrom" :model="AddCardFrom" :rules='addrules' label-width="80px">
 
+                <el-form-item label="版本" prop="c_vsersion">
+                    <div>
+                        <template>
+                            <template>
+                                <el-select v-model="AddCardFrom.c_vsersion" placeholder="请选择" >
+                                    <el-option
+                                            v-for="item in vsersionType"
+                                            :key="item.value"
+                                            :label="item.label"
+                                            :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </template>
+                        </template>
+                    </div>
+                </el-form-item>
                 <el-form-item label="玩法" prop="c_gameMethod">
                     <el-input type="text" placeholder="请输入什么玩法" v-model="AddCardFrom.c_gameMethod"></el-input>
                 </el-form-item>
-
                 <el-form-item label="牌数据" prop="c_gameCard">
                     <el-input type="text" placeholder="请输入json格式数据" v-model="AddCardFrom.c_gameCard"></el-input>
                 </el-form-item>
-
-                <el-form-item label="备注说明" prop="c_remark">
-                    <el-input type="text" placeholder="该牌使用于什么玩法" v-model="AddCardFrom.c_remark"></el-input>
+                <el-form-item label="功能" prop="c_remark">
+                    <el-input type="text" placeholder="功能介绍" v-model="AddCardFrom.c_remark"></el-input>
                 </el-form-item>
             </el-form>
-
             <el-alert v-if="re_data != ''" type="error">{{ re_data }}</el-alert>
             <span slot="footer" class="dialog-footer">
           <el-button type="danger" @click="Cancel">取 消</el-button>
@@ -92,10 +105,11 @@
     }
 </style>
 
-
 <script>
     import axios from 'axios'
+    import ElSelectDropdown from "element-ui/packages/select/src/select-dropdown";
     export default {
+        components: {ElSelectDropdown},
         props:['visible'],
         data() {
             return {
@@ -104,9 +118,9 @@
                 r_result: {
                     flag: false,
                 },
-
+                vsersionType:[{text:'牵手跑胡子',value:'牵手跑胡子'},{text:'牵手湖南麻将',value:'牵手湖南麻将'}],
                 AddCardFrom: {
-
+                    c_vsersion:"",
                     c_gameMethod:"",
                     c_gameCard:null,
                     c_remark:"",
@@ -118,6 +132,11 @@
                     c_gameMethod: [
                         {
                             required: true, message: '玩法不能为空.', trigger: 'blur'
+                        }
+                    ],
+                    c_vsersion: [
+                        {
+                            required: true, message: '版本不能为空.', trigger: 'blur'
                         }
                     ],
 
@@ -178,6 +197,7 @@
                     method:'post',
                     url:'/api/addcard/c_add',
                     data: {
+                        c_vsersion: this.AddCardFrom.c_vsersion,
                         c_gameMethod: this.AddCardFrom.c_gameMethod,
                         c_gameCard: this.AddCardFrom.c_gameCard,
                         c_remark: this.AddCardFrom.c_remark,

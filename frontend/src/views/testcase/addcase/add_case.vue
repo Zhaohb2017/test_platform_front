@@ -196,12 +196,12 @@
 
                 options_whether:[
                     {
-                        value: 'yes',
+                        value: '是',
                         label: '是',
                     },
 
                     {
-                        value: 'no',
+                        value: '否',
                         label: '否',
                     },
                 ],
@@ -259,6 +259,7 @@
         },
         mounted: function(){
             this.GetTestPoint();
+            console.log('FFFFFFFFFFFFFFFFF',this.AddDataForm.s_versions)
         },
         // 监听弹窗可视
         watch:{
@@ -294,6 +295,7 @@
                     that.caseData = resp.data.sort();
                     var jsonData = JSON.parse(JSON.stringify(that.caseData));
                     for( var item in jsonData){
+                        console.log(jsonData[item]);
                         console.log(jsonData[item]["t_content"]);
                         var obj = {};
                         obj["value"] = jsonData[item]["t_content"];

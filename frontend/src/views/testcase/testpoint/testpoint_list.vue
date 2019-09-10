@@ -33,9 +33,6 @@
       <el-table-column label="创建人" width="100" prop="t_user" header-align="center" align="center">
       </el-table-column>
 
-<!--      <el-table-column label="创建时间" width="100" prop="c_name" header-align="center" align="center">-->
-<!--      </el-table-column>-->
-
       <el-table-column label="版本" width="100" header-align="center" align="center" prop="t_version">
       </el-table-column>
 
@@ -59,10 +56,10 @@
 
       <el-table-column header-align="center" label="操作" align="center">
         <template slot-scope="scope">
-          <el-button size="mini" type="text" @click="ChangeEditFlag(scope.row)">编辑</el-button>
-<!--          <el-button size="mini" type="text" :disabled="scope.row.c_status == 1" @click="RunCase(scope.$index, scope.row)">运行</el-button>-->
-          <el-button size="mini" type="text" @click="handleDelete(scope.row)">删除</el-button>
-<!--          <el-button size="mini" type="text" @click="ReadReports(scope.$index, scope.row)">查看报告</el-button>-->
+          <el-button size="mini" type="primary" @click="ChangeEditFlag(scope.row)" icon="el-icon-edit" circle></el-button>
+
+          <el-button size="mini" type="danger" @click="handleDelete(scope.row)" icon="el-icon-delete" circle></el-button>
+
         </template>
       </el-table-column>
 
@@ -83,9 +80,6 @@
       </el-pagination>
     </div>
 
-<!--    <EditBugs :visible.sync="edit_show_flag" v-if="edit_show_flag" :current_data="current_data" @reload="reload"></EditBugs>-->
-
-<!--    <Reports :visible.sync="report_show_flag" v-if="report_show_flag" :report_current_data="report_current_data" @reload="reload" ></Reports>-->
 
   </div>
 </template>

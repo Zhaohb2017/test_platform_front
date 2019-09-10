@@ -1,8 +1,7 @@
 <template>
     <div class="bugs">
-        
         <!-- 添加、搜索功能 -->
-        <div class="head">
+        <div class="head" id="title">
             <h3>邵阳字牌</h3>
             <el-button type="danger" @click="getBugsList">刷新数据</el-button>
             <el-button type="danger" @click="ChangeAddFlag" >添加测试用例</el-button>
@@ -10,8 +9,6 @@
             <el-button type="primary" @click="Search" >搜索</el-button>
             <AddBugs :visible.sync="show_flag" v-if="show_flag" @reload="reload"></AddBugs>
         </div>
-
-
         <!-- 展示列表 -->
         <el-table 
         :data="showcaseData" 
@@ -52,13 +49,13 @@
             <el-table-column label="测试目的" width="190" header-align="center" align="center" prop="c_purpose">
             </el-table-column>
 
-            <el-table-column label="创房选项" width="290" min-width="180" header-align="center" prop="c_option">
+            <el-table-column label="创房选项" width="290" min-width="180" header-align="center" prop="c_RoomOptions">
             </el-table-column>
 
             <el-table-column label="做牌数据" width="290" min-width="180" header-align="center" prop="c_cards">
             </el-table-column>
 
-            <el-table-column label="操作步骤" width="290" min-width="180" header-align="center" prop="c_operate">
+            <el-table-column label="操作步骤" width="290" min-width="180" header-align="center" prop="c_step">
             </el-table-column>
 
             <el-table-column label="备注" width="130" align="center" prop="c_remake">
@@ -144,7 +141,7 @@
 </style>
 
 <script>
-import axios from 'axios'
+  import axios from 'axios'
 import AddBugs from './add_syzp'
 import EditBugs from './edit_syzp'
 import Reports from '../../../../reports/report'
@@ -202,16 +199,13 @@ import { start } from 'repl';
     methods: {
         reload(){
             if(this.edit_show_flag == true){
-                console.log("编辑组件调用了刷新")
                 this.edit_show_flag = false;
             }
             if(this.show_flag == true){
-                console.log("添加组件调用了刷新")
                 this.show_flag = false;
             }
 
             if(this.report_show_flag == true){
-                console.log("报告组建调用了刷新")
                 this.report_show_flag = false;
             }
             //可以刷新列表什么的
@@ -229,9 +223,14 @@ import { start } from 'repl';
                       }
            }).then(function(resp){
               that.caseData = resp.data.sort();
-              that.showcaseData = that.caseData.slice(0, that.current_page_size)
-              console.log("showcaseData: ", that.showcaseData)
-              
+              that.showcaseData = that.caseData.slice(0, that.current_page_size);
+               for (var i in that.showcaseData){
+                   that.showcaseData[i]["c_step"] = JSON.stringify(that.showcaseData[i]["c_operate"]); //操作步骤
+                   that.showcaseData[i]["c_RoomOptions"] = JSON.stringify(that.showcaseData[i]["c_option"]) //创房选项
+
+               }
+
+       
            }).catch(resp => {
               console.log('请求失败：'+resp.status+','+resp.statusText);
            });
@@ -243,17 +242,15 @@ import { start } from 'repl';
       },
 
         //修改修改Bug实例弹窗显示状态
-      ChangeEditFlag(row){
-          if(this.$store.state.user != null){
-            let new_data = JSON.parse(JSON.stringify(row))
-            new_data.c_option = eval('('+ row.c_option.replace("人数", "o_player").replace("局数", "o_round").replace("胡一等", "o_huyideng").replace("牌数", "o_card_num").replace("玩法", "o_wanfa") +')')
-            this.current_data = new_data
-            this.edit_show_flag = true;
-          }else{
-              this.$message.error("请先登录.")
-          }
-          
-      },
+        ChangeEditFlag(row){
+            if(this.$store.state.user != null){
+                let new_data = JSON.parse(JSON.stringify(row));
+                this.current_data = new_data;
+                this.edit_show_flag = true;
+            }else{
+                this.$message.error("请先登录.")
+            }
+        },
 
 
       // 删除bug数据

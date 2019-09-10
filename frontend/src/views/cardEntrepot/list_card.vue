@@ -9,6 +9,8 @@
             <el-button type="primary" @click="Search" >搜索</el-button>
             <Addknowledge :visible.sync="show_flag" v-if="show_flag" @reload="reload"></Addknowledge>
             <LoginName :visible.sync="dialogTableVisible" v-if="dialogTableVisible" :current_data="current_data" @reload="reload"></LoginName>
+            <PutCard :visible.sync="putCardInTheRoomVisible" v-if="putCardInTheRoomVisible" :current_data="current_data" @reload="reload"></PutCard>
+
         </div>
 
         <!-- 展示列表 -->
@@ -21,19 +23,23 @@
                 :header-cell-style="{background: '#F5F5F5'}"
                 :default-sort = "{prop: 'c_date', order: 'ascending'}">
 
+            <el-table-column label="版本" width="180" min-width="180" header-align="center" prop="t_versions">
+            </el-table-column>
+
             <el-table-column label="玩法" width="180" min-width="180" header-align="center" prop="t_method">
             </el-table-column>
 
-            <el-table-column label="牌" width="1000" min-width="180" header-align="center" prop="t_card" >
+            <el-table-column label="牌" width="700" min-width="180" header-align="center" prop="t_card" >
             </el-table-column>
 
-            <el-table-column label="备注" width="200" min-width="180" header-align="center" prop="t_remark">
+            <el-table-column label="功能" width="200" min-width="180" header-align="center" prop="t_remark">
             </el-table-column>
 
             <el-table-column header-align="center" label="操作" align="center">
                 <template slot-scope="scope">
                     <el-button size="mini" type="primary" @click="ChangeConfig(scope.$index, scope.row)">配置至服务器</el-button>
-                    <el-button size="mini" type="text" @click="handleDelete(scope.$index,scope.row)">删除</el-button>
+                    <el-button size="mini" type="primary" @click="putCardInTheRoom(scope.$index, scope.row)">配置至房间</el-button>
+                    <el-button size="mini" type="danger" @click="handleDelete(scope.$index,scope.row)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -106,10 +112,12 @@
     import axios from 'axios'
     import Addknowledge from './add_card'
     import LoginName   from "./ShowDeployIP"
+    import PutCard   from "./putCardInTheRoom"
     export default {
         components:{
             Addknowledge,
             LoginName,
+            PutCard,
 
         },
         name:"list_card",
@@ -121,7 +129,7 @@
                 report_show_flag: false,
                 show_deploy:false,
                 dialogTableVisible:false,
-
+                putCardInTheRoomVisible:false,
                 // 搜索内容
                 search_data: "",
 
@@ -162,7 +170,6 @@
 
         mounted: function(){
             this.getKnowledgeList();
-            console.log(`当前页33333333:`+this.showSkillData.length);
         },
 
         methods: {
@@ -170,20 +177,20 @@
 
             reload(){
                 if(this.edit_show_flag == true){
-                    console.log("编辑组件调用了刷新")
+
                     this.edit_show_flag = false;
                 }
                 if(this.show_flag == true){
-                    console.log("添加组件调用了刷新")
+
                     this.show_flag = false;
                 }
 
                 if(this.report_show_flag == true){
-                    console.log("报告组建调用了刷新")
+
                     this.report_show_flag = false;
                 }
                 if(this.show_deploy == true){
-                    console.log("配置IP刷新了哦")
+
                     this.show_deploy = false;
                 }
                 //可以刷新列表什么的
@@ -195,7 +202,12 @@
             ChangeConfig(index,row){
                 this.current_data = row;
                 this.dialogTableVisible=true;
-                console.log("zzzzzzzzzzzz",index,this.current_data);
+
+            },
+
+            putCardInTheRoom(index,row){
+                this.current_data = row;
+                this.putCardInTheRoomVisible=true;
 
             },
 

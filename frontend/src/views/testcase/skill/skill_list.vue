@@ -41,10 +41,10 @@
 
             <el-table-column header-align="center" label="操作" align="center">
                 <template slot-scope="scope">
-                    <el-button size="mini" type="text" @click="ChangeEditFlag(scope.$index,scope.row)">编辑</el-button>
-                    <!--          <el-button size="mini" type="text" :disabled="scope.row.c_status == 1" @click="RunCase(scope.$index, scope.row)">运行</el-button>-->
-                    <el-button size="mini" type="text" @click="handleDelete(scope.$index, scope.row)" style="color: #fa0000">删除</el-button>
-                    <!--          <el-button size="mini" type="text" @click="ReadReports(scope.$index, scope.row)">查看报告</el-button>-->
+                    <el-button size="mini" type="primary" @click="ChangeEditFlag(scope.$index,scope.row)" icon="el-icon-edit" circle></el-button>
+
+                    <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)" icon="el-icon-delete" circle></el-button>
+
                 </template>
             </el-table-column>
 
