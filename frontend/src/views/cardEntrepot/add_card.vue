@@ -15,7 +15,7 @@
                     <div>
                         <template>
                             <template>
-                                <el-select v-model="AddCardFrom.c_vsersion" placeholder="请选择" >
+                                <el-select v-model="AddCardFrom.c_vsersion" placeholder="请选择"  value="">
                                     <el-option
                                             v-for="item in vsersionType"
                                             :key="item.value"
@@ -37,7 +37,7 @@
                     <el-input type="text" placeholder="功能介绍" v-model="AddCardFrom.c_remark"></el-input>
                 </el-form-item>
             </el-form>
-            <el-alert v-if="re_data != ''" type="error">{{ re_data }}</el-alert>
+            <el-alert v-if="re_data !== ''" type="error">{{ re_data }}</el-alert>
             <span slot="footer" class="dialog-footer">
           <el-button type="danger" @click="Cancel">取 消</el-button>
           <el-button type="danger" @click="RemoveData">清 除</el-button>
@@ -118,7 +118,13 @@
                 r_result: {
                     flag: false,
                 },
-                vsersionType:[{text:'牵手跑胡子',value:'牵手跑胡子'},{text:'牵手湖南麻将',value:'牵手湖南麻将'}],
+                vsersionType:[  {text:'牵手跑胡子',value:'牵手跑胡子'},
+                                {text:'牵手湖南麻将',value:'牵手湖南麻将'},
+                                {text:'牵手长沙棋牌',value:'牵手长沙棋牌'},
+                                {text:'牵手岳阳棋牌',value:'牵手岳阳棋牌'},
+                                {text:'牵手益阳棋牌',value:'牵手益阳棋牌'},
+
+                                ],
                 AddCardFrom: {
                     c_vsersion:"",
                     c_gameMethod:"",
@@ -204,16 +210,16 @@
                     }
                 }).then(function(resp){
                     that.$refs['AddCardFrom'].resetFields();
-                    if(resp.data == "请输入json格式数据"){
-                        alert(resp.data)
+                    if(resp.data["code"] === 200){
+                        alert(resp.data["msg"]);
+                        setTimeout(() => {
+                        that.$emit("reload")
+                      }, 800);
                     }else{
-                        console.log(222222222222222)
-                        that.re_data = resp.data;
+                        that.re_data = resp.data["msg"];
                     }
 
-                    setTimeout(() => {
-                        that.$emit("reload")
-                    }, 800);
+
                 }).catch(resp => {
                     that.re_data = resp.data
                 });

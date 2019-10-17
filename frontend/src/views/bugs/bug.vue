@@ -3,11 +3,13 @@
         
         <!-- 添加、搜索功能 -->
         <div class="head">
-            <el-button type="danger" @click="getBugsList">刷新数据</el-button>
-            <el-button type="danger" @click="ChangeAddFlag" >添加Bug实例</el-button>
-            <el-input type="text" prefix-icon="el-icon-search" required style="width:200px;" v-model="search_data" placeholder="请输入关键字搜索..."></el-input>
-            <el-button type="primary" icon="el-icon-search" @click="Search" >搜索</el-button>
-            <AddBugs :visible.sync="show_flag" v-if="show_flag" @reload="reload"></AddBugs>
+            <div class="head_fun">
+                <el-button type="danger" @click="getBugsList">刷新数据</el-button>
+                <el-button type="danger" @click="ChangeAddFlag" >添加Bug实例</el-button>
+                <el-input type="text" prefix-icon="el-icon-search" required style="width:200px;" v-model="search_data" placeholder="请输入关键字搜索..."></el-input>
+                <el-button type="primary" icon="el-icon-search" @click="Search" >搜索</el-button>
+                <AddBugs :visible.sync="show_flag" v-if="show_flag" @reload="reload"></AddBugs>
+            </div>
         </div>
 
 
@@ -89,10 +91,21 @@
 <style lang="less" scoped>
 .bugs{
     margin: 1%;
+    top: 0;
+}
+
+h3{
+    float: left;
 }
 
 .head{
-    margin-bottom: 1%;
+    float: left;
+}
+
+.head_fun{
+    margin-top: 5%;
+    float: left;
+    margin-bottom: 3%;
 }
 
 .cell{
@@ -136,6 +149,7 @@
 import axios from 'axios'
 import AddBugs from './add_bug'
 import EditBugs from './edit_bug'
+import {timeFormat} from '../../../libs/time.js'
 import { truncate } from 'fs';
 import { start } from 'repl';
   export default {
@@ -245,8 +259,12 @@ import { start } from 'repl';
               url:'/api/bugs/b_list'
            }).then(function(resp){
               that.bugData = resp.data.sort();
-              that.showBugData = that.bugData.slice(0, that.current_page_size)
-            //   console.log("showBugData: ", that.showBugData)
+              that.showBugData = that.bugData.slice(0, that.current_page_size);
+              console.log("showBugData: ", that.showBugData);
+              for(var i in that.showBugData){
+                 that.showBugData[i]["b_date"] = timeFormat(that.showBugData[i]["b_date"]);
+              }
+
               
            }).catch(resp => {
               console.log('请求失败：'+resp.status+','+resp.statusText);

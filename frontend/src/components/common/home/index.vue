@@ -1,15 +1,14 @@
 <template>
-  <div id="website">
-    <Head></Head>
-    <el-row class="content">
-        <el-col :span="3" style="height:100%">
-            <Menu></Menu>
-        </el-col>
-        <el-col :span="21">
-            <router-view/>
-         </el-col>
-      </el-row>
-</div>
+  <el-container>
+    <el-header>
+      <Head></Head>
+    </el-header>
+    <el-container>
+      <el-aside style="width: 13%; height:100%"><Menu></Menu></el-aside>
+      <el-main> <router-view/></el-main>
+    </el-container>
+  </el-container>
+
 </template>
 
 <script>
@@ -24,31 +23,39 @@ export default {
 }
 </script>
 <style scoped lang="less">
-.el-row{
-    height: 100%;
-    width: 100%;
-    // max-height: 90vh;
-    position: fixed;
-    overflow-y: auto;
-}
-
-
-
-.content{
-    margin-top: 10vh;
-    height: 100%;
-}
-.content-main{
-    float: left;
-}
-#website{
-    // text-align: center;
-    width: 100%;
-    height: 100%;
-}
-
-  .el-col el-col-21{
-    height: 100%;
-    overflow-y: auto;
+.el-header, .el-footer {
+    color: #333;
+    text-align: center;
   }
+  
+.el-aside {
+  background-color:white;
+  text-align: left;
+  height: 100%;
+  min-height: 880px;
+  margin-top:2%;
+  // border-right: solid 1px #e6e6e6;
+  overflow: hidden;
+  display: block;
+}
+
+.el-submenu{
+  height: 100%;
+  display: block;
+}
+
+
+.el-main {
+  background-color:white;
+  color: #333;
+  text-align: center;
+  margin-left: -1%;
+}
+
+body > .el-container {
+  margin-bottom: 40px;
+}
+
 </style>
+
+

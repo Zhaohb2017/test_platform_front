@@ -120,9 +120,6 @@
     .box-card {
         width: 100%;
     }
-    .el-input-number{
-
-    }
 
 </style>
 

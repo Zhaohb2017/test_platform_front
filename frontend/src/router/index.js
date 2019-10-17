@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+// import Home from '@/components/common/home/index'
 import Home from '@/components/common/home/index'
 import ElementUI from 'element-ui'
 // import 'element-ui/lib/theme-default/index.css'
@@ -17,7 +18,7 @@ export default new Router({
       children:[
         {
           path:"/",
-          component:()=> import('@/views/bugs/bug')
+          component:()=> import('@/views/testcase/addcase/case_list')
         },
         {
           path: '/member',
@@ -200,6 +201,12 @@ export default new Router({
           name: 'skill',
           component: () => import('@/views/testcase/skill/skill_list')
         },
+        // 测试报告
+        {
+          path: '/testcase/testReport/list',
+          name: 'testReport',
+          component: () => import('@/views/testcase/testReport/testReport_list')
+        },
 
         {
           path: '/testcase/testpoint/list',
@@ -210,6 +217,7 @@ export default new Router({
         {
           path: '/testcase/addcase/list',
           name: 'addcase',
+          // component: () => import('@/views/testcase/addcase/case_list')
           component: () => import('@/views/testcase/addcase/case_list')
         },
         // 测试牌库
@@ -242,6 +250,18 @@ export default new Router({
           path: '/operateSystem/version/list',
           name: 'configuration',
           component: () => import('@/views/operateSystem/versions/version_list')
+        },
+        // 操作日志
+        {
+          path: '/tool/loginfo/list',
+          name: 'tool',
+          component: () => import('@/views/tool/logInfo/log')
+        },
+        // 周报
+        {
+          path: '/tool/weekly/list',
+          name: 'weekly',
+          component: () => import('@/views/tool/Weekly/weekly_list')
         },
 
 

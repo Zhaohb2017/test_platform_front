@@ -3,10 +3,12 @@
         <!-- 添加、搜索功能 -->
         <div class="head">
             <h3>版本信息</h3>
-            <el-button type="danger" @click="ChangeAddFlag" >添加</el-button>
-            <el-input type="text" prefix-icon="el-icon-search" required style="width:200px;" v-model="search_data" placeholder="请输入版本名称搜索..."></el-input>
-            <el-button type="primary" @click="Search" >搜索</el-button>
-            <Addknowledge :visible.sync="show_flag" v-if="show_flag" @reload="reload"></Addknowledge>
+            <div class="head_fun">
+                <el-button type="danger" @click="ChangeAddFlag" >添加</el-button>
+                <el-input type="text" prefix-icon="el-icon-search" required style="width:200px;" v-model="search_data" @keyup.enter.native="Search" placeholder="请输入版本名称搜索..."></el-input>
+                <el-button type="primary" @click="Search" >搜索</el-button>
+                <Addknowledge :visible.sync="show_flag" v-if="show_flag" @reload="reload"></Addknowledge>
+            </div>
         </div>
 
 
@@ -64,10 +66,22 @@
 <style lang="less" scoped>
     .bugs{
         margin: 1%;
+        top: 0;
+    }
+
+    h3{
+        float: left;
     }
 
     .head{
-        margin-bottom: 1%;
+        float: left;
+    }
+
+    .head_fun{
+        margin-top: 13%;
+        float: left;
+        margin-left: -18%;
+        margin-bottom: 5%;
     }
 
     .cell{

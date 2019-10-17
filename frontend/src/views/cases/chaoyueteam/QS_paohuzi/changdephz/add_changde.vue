@@ -2,7 +2,7 @@
     <div v-if="add_visible" class="lg">
         <el-dialog
                 title="添加测试用例 - 常德跑胡子"
-                width="50%"
+                width="40%"
                 center
                 :show-close = "false"
                 :modal-append-to-body="false"
@@ -15,9 +15,7 @@
                     <el-date-picker type="datetime" style="width: 100%;" placeholder="选择日期" v-model="AddCaseForm.c_date"></el-date-picker>
                 </el-form-item>
 
-                <el-form-item label="提 交 人" prop="c_name">
-                    <el-input type="text" placeholder="请输入提交人信息" v-model="AddCaseForm.c_name"></el-input>
-                </el-form-item>
+
                 <el-form-item label="用户mid" prop="c_mid">
                     <el-input type="text" placeholder="请输入用户mid" v-model="AddCaseForm.c_mid"></el-input>
                 </el-form-item>
@@ -139,7 +137,7 @@
             </el-form>
             <el-form :model="operationForm"
                      ref="operationForm"
-                     label-width="130px"
+                     label-width="80px"
                      center
                      size="small">
                 <el-form-item label="测试步骤"  prop="servin" >
@@ -172,7 +170,14 @@
                             </el-table-column>
                             <el-table-column prop="card" label="牌">
                                 <template slot-scope="scope">
-                                    <el-input size="mini" v-model="scope.row.card"  ></el-input>
+                                    <el-select v-model="scope.row.card" multiple clearable placeholder="请选择牌型" v-show="getOption(operationList[scope.$index].operation) === true" >
+                                        <el-option
+                                                v-for="item in card_type"
+                                                :key="item.value"
+                                                :label="item.text"
+                                                :value="item.value">
+                                        </el-option>
+                                    </el-select>
                                 </template>
                             </el-table-column>
                             <el-table-column fixed="right"  label="操作">
@@ -184,7 +189,7 @@
                     </template>
                 </el-form-item>
             </el-form>
-            <el-alert v-if="re_data != ''" type="error">{{ re_data }}</el-alert>
+            <el-alert v-if="re_data !== ''" type="error">{{ re_data }}</el-alert>
 
             <span slot="footer" class="dialog-footer">
           <el-button type="danger" @click="Cancel">取 消</el-button>
@@ -267,11 +272,94 @@
                 roomType:[{text:'普通创房',value:'普通创房'},{text:'俱乐部创房',value:'俱乐部创房'}],
                 clubRoomType:[{text:'金币创房',value:'金币创房'}],
                 operationList:[],
+                operation_list:['碰牌', '吃牌', '出牌'],
                 operation_type:[{text:'胡牌',value:'胡牌'},
                     {text:'碰牌',value:'碰牌'},
                     {text:'吃牌',value:'吃牌'},
                     {text:'出牌',value:'出牌'},
                     {text:'过牌',value:'过牌'},
+                ],
+                card_type:[
+                    {
+                        text: '1s',
+                        value: '1s'
+                    },
+                    {
+                        text: '2s',
+                        value: '2s'
+                    },          {
+                        text: '3s',
+                        value: '3s'
+                    },
+                    {
+                        text: '4s',
+                        value: '4s'
+                    },
+                    {
+                        text: '5s',
+                        value: '5s'
+                    },
+                    {
+                        text: '6s',
+                        value: '6s'
+                    },
+                    {
+                        text: '7s',
+                        value: '7s'
+                    },
+                    {
+                        text: '8s',
+                        value: '8s'
+                    },
+                    {
+                        text: '9s',
+                        value: '9s'
+                    },
+                    {
+                        text: 'Ts',
+                        value: 'Ts'
+                    },
+                    {
+                        text: '1b',
+                        value: '1b'
+                    },
+                    {
+                        text: '2b',
+                        value: '2b'
+                    },
+                    {
+                        text: '3b',
+                        value: '3b'
+                    },
+                    {
+                        text: '4b',
+                        value: '4b'
+                    },
+                    {
+                        text: '5b',
+                        value: '5b'
+                    },
+                    {
+                        text: '6b',
+                        value: '6b'
+                    },
+                    {
+                        text: '7b',
+                        value: '7b'
+                    },
+                    {
+                        text: '8b',
+                        value: '8b'
+                    },
+                    {
+                        text: '9b',
+                        value: '9b'
+                    },
+                    {
+                        text: 'Tb',
+                        value: 'Tb'
+                    },
+
                 ],
                 users:[{text:'玩家1',value:'玩家1'},{text:'玩家2',value:'玩家2'},{text:'玩家3',value:'玩家3'}],
                 roomType:[{text:'普通创房',value:'普通创房'},{text:'俱乐部创房',value:'俱乐部创房'}],
@@ -376,6 +464,13 @@
                 ////删除改行
                 rows.splice(index, 1);
             },
+            getOption(val){
+                for(var i in this.operation_list){
+                    if (val === this.operation_list[i]){
+                        return true
+                    }
+                }
+            },
             createRoomType(val){
                 console.log("xxxxxxx",val);
                 if(val=="俱乐部创房"){
@@ -428,23 +523,18 @@
             AddCase(){
                 if(this.$store.state.user != null){
                     if(this.AddCaseForm.c_date == ''){
-                        this.$message.error("日期不能为空.")
-                        return
-                    }
-
-                    if(this.AddCaseForm.c_name == ''){
-                        this.$message.error("提交人不能为空.")
+                        this.$message.error("日期不能为空.");
                         return
                     }
 
 
                     if(this.AddCaseForm.c_purpose == ''){
-                        this.$message.error("测试目的不能为空.")
+                        this.$message.error("测试目的不能为空.");
                         return
                     }
 
                     if(this.AddCaseForm.c_cards == ''){
-                        this.$message.error("做牌数据不能为空.")
+                        this.$message.error("做牌数据不能为空.");
                         return
                     }
 
@@ -458,7 +548,7 @@
                             c_cards: this.AddCaseForm.c_cards,
                             c_date: this.AddCaseForm.c_date,
                             c_account: this.AddCaseForm.c_mid,
-                            c_name: this.AddCaseForm.c_name,
+                            c_name: this.$store.state.user,
                             c_purpose: this.AddCaseForm.c_purpose,
                             c_remake: this.AddCaseForm.c_remake,
                             c_steps: this.operationList,

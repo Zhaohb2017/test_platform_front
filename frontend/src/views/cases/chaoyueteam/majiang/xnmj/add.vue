@@ -2,7 +2,7 @@
     <div v-if="add_visible" class="lg">
       <el-dialog 
       title="添加测试用例 - 新宁麻将"
-      width="60%"
+      width="40%"
       center
       :show-close = "false"
       :modal-append-to-body="false"
@@ -15,9 +15,6 @@
             <el-date-picker type="datetime" style="width: 100%;" placeholder="选择日期" v-model="AddCaseForm.c_date"></el-date-picker>
           </el-form-item>
 
-          <el-form-item label="提 交 人" prop="c_name">
-            <el-input type="text" placeholder="请输入提交人信息" v-model="AddCaseForm.c_name"></el-input>
-          </el-form-item>
           <el-form-item label="用户mid" prop="c_mid">
             <el-input type="text" placeholder="输入mid,例:[127843,127641,127866]" v-model="AddCaseForm.c_mid"></el-input>
           </el-form-item>
@@ -181,7 +178,7 @@
         </el-form>
         <el-form :model="operationForm"
                    ref="operationForm"
-                   label-width="130px"
+                   label-width="80px"
                    center
                    size="small">
               <el-form-item label="测试步骤"  prop="servin" >
@@ -214,8 +211,22 @@
                           </el-table-column>
                           <el-table-column prop="card" label="牌">
                               <template slot-scope="scope">
-                                  <el-input size="mini" v-model="scope.row.card"  ></el-input>
-                                  
+                                  <el-select v-model="scope.row.card" multiple collapse-tags clearable placeholder="请选择牌型" v-show="getOption(operationList[scope.$index].operation) === true" >
+                                      <el-option
+                                              v-for="item in card_type"
+                                              :key="item.value"
+                                              :label="item.text"
+                                              :value="item.value">
+                                      </el-option>
+                                  </el-select>
+                                  <el-select v-model="scope.row.integral_cards" placeholder="请选择加锤" v-show="operationList[scope.$index].operation === '加锤' ">
+                                      <el-option
+                                              v-for="item in jiaochui_type"
+                                              :key="item.value"
+                                              :label="item.text"
+                                              :value="item.value">
+                                      </el-option>
+                                  </el-select>
                               </template>
                           </el-table-column>
                           <el-table-column fixed="right"  label="操作">
@@ -304,14 +315,130 @@ import axios from 'axios'
         // 添加新的翻倍积分标记
         doublePlusNewShowFlag:false,
         operationList:[],
-          operation_type:[{text:'胡牌',value:'胡牌'},
-              {text:'碰牌',value:'碰牌'},
-              {text:'吃牌',value:'吃牌'},
-              {text:'出牌',value:'出牌'},
-              {text:'过牌',value:'过牌'},
-              {text:'补杠',value:'补杠'},
-              {text:'加锤',value:'加锤'},
-          ],
+        jiaochui_type:[{ text: '是',value: '是'},{ text: '否',value: '否'}],
+        operation_type:[{text:'胡牌',value:'胡牌'},
+          {text:'碰牌',value:'碰牌'},
+          {text:'吃牌',value:'吃牌'},
+          {text:'出牌',value:'出牌'},
+          {text:'过牌',value:'过牌'},
+          {text:'补杠',value:'补杠'},
+          {text:'加锤',value:'加锤'},
+        ],
+        card_type:[
+          {
+              text: '1S',
+              value: '1S'
+          },
+          {
+              text: '2S',
+              value: '2S'
+          },          {
+              text: '3S',
+              value: '3S'
+          },
+          {
+              text: '4S',
+              value: '4S'
+          },
+          {
+              text: '5S',
+              value: '5S'
+          },
+          {
+              text: '6S',
+              value: '6S'
+          },
+          {
+              text: '7S',
+              value: '7S'
+          },
+          {
+              text: '8S',
+              value: '8S'
+          },
+          {
+              text: '9S',
+              value: '9S'
+          },
+          {
+              text: 'HZ',
+              value: 'HZ'
+          },
+          {
+              text: '1W',
+              value: '1W'
+          },
+          {
+              text: '2W',
+              value: '2W'
+          },
+          {
+              text: '3W',
+              value: '3W'
+          },
+          {
+              text: '4W',
+              value: '4W'
+          },
+          {
+              text: '5W',
+              value: '5W'
+          },
+          {
+              text: '6W',
+              value: '6W'
+          },
+          {
+              text: '7W',
+              value: '7W'
+          },
+          {
+              text: '8W',
+              value: '8W'
+          },
+          {
+              text: '9W',
+              value: '9W'
+          },
+          {
+              text: '1T',
+              value: '1T'
+          },
+          {
+              text: '2T',
+              value: '2T'
+          },
+          {
+              text: '3T',
+              value: '3T'
+          },
+          {
+              text: '4T',
+              value: '4T'
+          },
+          {
+              text: '5T',
+              value: '5T'
+          },
+          {
+              text: '6T',
+              value: '6T'
+          },
+          {
+              text: '7T',
+              value: '7T'
+          },
+          {
+              text: '8T',
+              value: '8T'
+          },
+          {
+              text: '9T',
+              value: '9T'
+          },
+
+      ],
+        operation_list:[ '吃牌', '出牌',"补杠"],
         users:[{text:'玩家1',value:'玩家1'},{text:'玩家2',value:'玩家2'},{text:'玩家3',value:'玩家3'},{text:'玩家4',value:'玩家4'}],
         roomType:[{text:'普通创房',value:'普通创房'},{text:'俱乐部创房',value:'俱乐部创房'}],
         clubRoomType:[{text:'金币创房',value:'金币创房'}],
@@ -444,7 +571,13 @@ import axios from 'axios'
               this.AddCaseForm.c_options.o_bankerchui =false;
           }
         },
-
+        getOption(val){
+            for(var i in this.operation_list){
+                if (val === this.operation_list[i]){
+                    return true
+                }
+            }
+        },
         // 加倍选项判断
        double(val){
            if(val==1){
@@ -499,17 +632,13 @@ import axios from 'axios'
         },
     
       AddCase(){
-          let that = this
+          let that = this;
           if(this.$store.state.user != null){
               if(this.AddCaseForm.c_date == ''){
                 this.$message.error("日期不能为空.");
                 return
               }
 
-              if(this.AddCaseForm.c_name == ''){
-                this.$message.error("提交人不能为空.");
-                return
-              }
 
               if(this.AddCaseForm.c_purpose == ''){
                 this.$message.error("测试目的不能为空.");
@@ -527,7 +656,7 @@ import axios from 'axios'
                   data: {
                       c_cards: this.AddCaseForm.c_cards,
                       c_date: this.AddCaseForm.c_date,
-                      c_name: this.AddCaseForm.c_name,
+                      c_name: this.$store.state.user,
                       c_account:this.AddCaseForm.c_mid,
                       c_purpose: this.AddCaseForm.c_purpose,
                       c_remake: this.AddCaseForm.c_remake,

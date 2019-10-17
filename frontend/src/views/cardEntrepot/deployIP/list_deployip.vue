@@ -3,11 +3,13 @@
         <!-- 添加、搜索功能 -->
         <div class="head">
             <h3>配置服务器IP</h3>
-            <el-button type="danger" @click="getKnowledgeList">刷新数据</el-button>
-            <el-button type="danger" @click="ChangeAddFlag" >添加服务器IP</el-button>
-            <el-input type="text" prefix-icon="el-icon-search" required style="width:200px;" v-model="search_data" placeholder="IP搜索..."></el-input>
-            <el-button type="primary" @click="Search" >搜索</el-button>
-            <Addknowledge :visible.sync="show_flag" v-if="show_flag" @reload="reload"></Addknowledge>
+            <div class="head_fun">
+                <el-button type="danger" @click="getKnowledgeList">刷新数据</el-button>
+                <el-button type="danger" @click="ChangeAddFlag" >添加服务器IP</el-button>
+                <el-input type="text" prefix-icon="el-icon-search" required style="width:200px;" v-model="search_data" placeholder="IP搜索..."></el-input>
+                <el-button type="primary" @click="Search" >搜索</el-button>
+                <Addknowledge :visible.sync="show_flag" v-if="show_flag" @reload="reload"></Addknowledge>
+            </div>
         </div>
 
         <!-- 展示列表 -->
@@ -31,7 +33,7 @@
             </el-table-column>
             <el-table-column label="密码" width="150" min-width="180" header-align="center" prop="t_pwd" >
             </el-table-column>
-            <el-table-column label="路径" width="400" min-width="180" header-align="center" prop="t_path" >
+            <el-table-column label="路径" width="400" min-width="180" header-align="center" prop="path" >
             </el-table-column>
             <el-table-column label="文件名" width="200" min-width="180" header-align="center" prop="t_filename" >
             </el-table-column>
@@ -51,7 +53,7 @@
 
         <div class="block">
             <el-pagination
-                    small="true"
+
                     background
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
@@ -71,10 +73,22 @@
 <style lang="less" scoped>
     .bugs{
         margin: 1%;
+        top: 0;
+    }
+
+    h3{
+        float: left;
     }
 
     .head{
-        margin-bottom: 1%;
+        float: left;
+    }
+
+    .head_fun{
+        margin-top: 10%;
+        float: left;
+        margin-left: -18%;
+        margin-bottom: 5%;
     }
 
     .cell{
@@ -149,6 +163,7 @@
 
                 // table展示数据
                 showSkillData: [],
+                showDeployData: [],
 
                 // 当前初始的index
                 start_index: 0,
@@ -190,8 +205,12 @@
                     url:'/api/deployip/i_list',
                 }).then(function(resp){
                     that.showDeployData = resp.data.sort();
+                    for (var i in that.showDeployData) {
+                        that.showDeployData[i]["path"] = (that.showDeployData[i]["t_path"]);
+                        that.showDeployData[i]["path"] = JSON.stringify(that.showDeployData[i]["path"]);
+                    }
                     that.showSkillData = that.showDeployData.slice(0, that.current_page_size);
-                    console.log("showData1111111111111: ", that.showSkillData)
+
                 }).catch(resp => {
                     console.log('请求失败：'+resp.status+','+resp.statusText);
                 });

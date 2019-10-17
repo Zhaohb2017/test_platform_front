@@ -24,9 +24,32 @@
                 <el-form-item label="密码" prop="c_pwd">
                     <el-input type="text" placeholder="请输入密码" v-model="AddServiceFrom.c_pwd"></el-input>
                 </el-form-item>
-                <el-form-item label="路径" prop="c_path">
-                    <el-input type="text" placeholder="请输入路径" v-model="AddServiceFrom.c_path"></el-input>
-                </el-form-item>
+<!--                <el-form-item label="路径" prop="c_path">-->
+<!--                    <el-input type="text" placeholder="请输入路径" v-model="AddServiceFrom.c_path"></el-input>-->
+<!--                </el-form-item>-->
+                <el-form :model="AddServiceFrom"
+                         ref="AddServiceFrom"
+                         label-width="80px"
+                         center
+                         size="small">
+                    <el-form-item label="路径添加"  prop="servin" >
+                        <el-button type="primary" @click="addRow(operationList)">新增</el-button>
+                        <template>
+                            <el-table border :data="operationList" style="width: 100%" >
+                                <el-table-column prop="user" label="玩家" style="width:6vw;" >
+                                    <template slot-scope="scope">
+                                        <el-input type="text" placeholder="请输入路径" v-model="scope.row.c_path"></el-input>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column fixed="right"  label="操作">
+                                    <template slot-scope="scope">
+                                        <el-button @click.native.prevent="deleteRow(scope.$index, operationList)" size="small"> 移除 </el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </template>
+                    </el-form-item>
+                </el-form>
                 <el-form-item label="牌文件名" prop="c_filename">
                     <el-input type="text" placeholder="不填写默认为testcard.json文件" v-model="AddServiceFrom.c_filename"></el-input>
                 </el-form-item>
@@ -36,6 +59,7 @@
 
 
             </el-form>
+
 
             <el-alert v-if="re_data != ''" type="error">{{ re_data }}</el-alert>
             <span slot="footer" class="dialog-footer">
@@ -117,14 +141,13 @@
                 r_result: {
                     flag: false,
                 },
-
+                operationList:[],
                 AddServiceFrom: {
 
                     c_ip:"",
                     c_port:"",
                     c_user:"",
                     c_pwd:"",
-                    c_path:"",
                     c_remake:"",
                     c_filename:"",
 
@@ -196,7 +219,14 @@
             RemoveData(){
                 this.$refs['AddServiceFrom'].resetFields()
             },
-
+            addRow(tableData,event){
+                console.log('ffffffff',tableData);
+                tableData.push({c_path: ''})
+            },
+            deleteRow(index, rows){
+                ////删除改行
+                rows.splice(index, 1);
+            },
             Cancel(){
                 this.$refs['AddServiceFrom'].resetFields();
                 this.add_visible = false;
@@ -212,7 +242,7 @@
                         c_port: this.AddServiceFrom.c_port,
                         c_user: this.AddServiceFrom.c_user,
                         c_pwd: this.AddServiceFrom.c_pwd,
-                        c_path: this.AddServiceFrom.c_path,
+                        c_path: this.operationList,
                         c_filename: this.AddServiceFrom.c_filename,
                         c_remake: this.AddServiceFrom.c_remake,
                     }

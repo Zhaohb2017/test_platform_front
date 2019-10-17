@@ -2,7 +2,7 @@
     <div v-if="edit_visible" class="lg">
       <el-dialog 
       title="编辑测试用例 - 靖州麻将"
-      width="60%"
+      width="50%"
       center
       :show-close = "false"
       :modal-append-to-body="false"
@@ -26,12 +26,13 @@
           </el-table-column>
 
           <el-form-item label="日 期" prop="c_date">
-            <el-date-picker type="text" style="width: 100%;" disabled placeholder="选择日期" v-model="editCaseForm.c_date"></el-date-picker>
+              <el-date-picker type="datetime"
+                              style="width: 100%;"
+                              disabled
+                              placeholder="选择日期"
+                              v-model="editCaseForm.c_date"></el-date-picker>
           </el-form-item>
 
-          <el-form-item label="提 交 人" prop="c_name">
-            <el-input type="text" placeholder="请输入提交人信息" disabled v-model="editCaseForm.c_name"></el-input>
-          </el-form-item>
             <el-form-item label="用户mid" prop="c_mid">
                 <el-input type="text" placeholder="输入用户mid" v-model="editCaseForm.c_mid"></el-input>
             </el-form-item>
@@ -216,7 +217,7 @@
         </el-form>
           <el-form :model="operationForm"
                    ref="operationForm"
-                   label-width="130px"
+                   label-width="80px"
                    center
                    size="small">
               <el-form-item label="测试步骤"  prop="servin" >
@@ -249,7 +250,14 @@
                           </el-table-column>
                           <el-table-column prop="card" label="牌">
                               <template slot-scope="scope">
-                                  <el-input size="mini" v-model="scope.row.card"  ></el-input>
+                                  <el-select v-model="scope.row.card" multiple clearable placeholder="请选择牌型" v-show="getOption(operationList[scope.$index].operation) === true" >
+                                      <el-option
+                                              v-for="item in card_type"
+                                              :key="item.value"
+                                              :label="item.text"
+                                              :value="item.value">
+                                      </el-option>
+                                  </el-select>
                               </template>
                           </el-table-column>
                           <el-table-column fixed="right"  label="操作">
@@ -332,6 +340,121 @@ import axios from 'axios'
               {text:'过牌',value:'过牌'},
               {text:'补杠',value:'补杠'},
           ],
+          operation_list:[ '吃牌', '出牌',"补杠"],
+          card_type:[
+              {
+                  text: '1S',
+                  value: '1S'
+              },
+              {
+                  text: '2S',
+                  value: '2S'
+              },          {
+                  text: '3S',
+                  value: '3S'
+              },
+              {
+                  text: '4S',
+                  value: '4S'
+              },
+              {
+                  text: '5S',
+                  value: '5S'
+              },
+              {
+                  text: '6S',
+                  value: '6S'
+              },
+              {
+                  text: '7S',
+                  value: '7S'
+              },
+              {
+                  text: '8S',
+                  value: '8S'
+              },
+              {
+                  text: '9S',
+                  value: '9S'
+              },
+              {
+                  text: 'HZ',
+                  value: 'HZ'
+              },
+              {
+                  text: '1W',
+                  value: '1W'
+              },
+              {
+                  text: '2W',
+                  value: '2W'
+              },
+              {
+                  text: '3W',
+                  value: '3W'
+              },
+              {
+                  text: '4W',
+                  value: '4W'
+              },
+              {
+                  text: '5W',
+                  value: '5W'
+              },
+              {
+                  text: '6W',
+                  value: '6W'
+              },
+              {
+                  text: '7W',
+                  value: '7W'
+              },
+              {
+                  text: '8W',
+                  value: '8W'
+              },
+              {
+                  text: '9W',
+                  value: '9W'
+              },
+              {
+                  text: '1T',
+                  value: '1T'
+              },
+              {
+                  text: '2T',
+                  value: '2T'
+              },
+              {
+                  text: '3T',
+                  value: '3T'
+              },
+              {
+                  text: '4T',
+                  value: '4T'
+              },
+              {
+                  text: '5T',
+                  value: '5T'
+              },
+              {
+                  text: '6T',
+                  value: '6T'
+              },
+              {
+                  text: '7T',
+                  value: '7T'
+              },
+              {
+                  text: '8T',
+                  value: '8T'
+              },
+              {
+                  text: '9T',
+                  value: '9T'
+              },
+
+          ],
           users:[{text:'玩家1',value:'玩家1'},{text:'玩家2',value:'玩家2'},{text:'玩家3',value:'玩家3'},{text:'玩家4',value:'玩家4'}],
           roomType:[{text:'普通创房',value:'普通创房'},{text:'俱乐部创房',value:'俱乐部创房'}],
           clubRoomType:[{text:'金币创房',value:'金币创房'}],
@@ -391,7 +514,13 @@ import axios from 'axios'
                 this.doublePlusNewShowFlag = false;
             }
         },
-
+        getOption(val){
+            for(var i in this.operation_list){
+                if (val === this.operation_list[i]){
+                    return true
+                }
+            }
+        },
         ZhuaNiao(val){
             if(val !='不抓鸟'){
                 this.ShowZhuaNiao = true;
@@ -476,40 +605,42 @@ import axios from 'axios'
       },
     
       EditBugs(){
-          let that = this;
-          axios({
-              method:'post',
-              url:'/api/cases/c_edit',
-              data: {
-                  c_id: this.editCaseForm.c_id,
-                  c_date: this.editCaseForm.c_date,
-                  c_name: this.editCaseForm.c_name,
-                  c_play: this.editCaseForm.c_play,
-                  c_purpose: this.editCaseForm.c_purpose,
-                  c_option: this.editCaseForm.c_option,
-                  c_operate: this.operationList,
-                  c_cards: this.editCaseForm.c_cards,
-                  c_remake: this.editCaseForm.c_remake,
-                  c_file_name: this.editCaseForm.c_file_name,
-                  c_is_local: this.editCaseForm.c_is_local,
-                  c_project: this.editCaseForm.c_project,
-                  c_account:this.editCaseForm.c_mid,
-              }
-           }).then(function(resp){
-              if (resp.data["code"]==300){
-                  alert(resp.data["Msg"])
-              }else {
-                  that.$refs['editCaseForm'].resetFields();
-                  alert(resp.data);
-                  that.re_data = resp.data;
-                  setTimeout(() => {
-                      that.$emit("reload")
-                  }, 800);
+          if(this.$store.state.user != null){
+              let that = this;
+              axios({
+                  method:'post',
+                  url:'/api/cases/c_edit',
+                  data: {
+                      c_id: this.editCaseForm.c_id,
+                      c_date: this.editCaseForm.c_date,
+                      c_name: this.$store.state.user,
+                      c_play: this.editCaseForm.c_play,
+                      c_purpose: this.editCaseForm.c_purpose,
+                      c_option: this.editCaseForm.c_option,
+                      c_operate: this.operationList,
+                      c_cards: this.editCaseForm.c_cards,
+                      c_remake: this.editCaseForm.c_remake,
+                      c_file_name: this.editCaseForm.c_file_name,
+                      c_is_local: this.editCaseForm.c_is_local,
+                      c_project: this.editCaseForm.c_project,
+                      c_account:this.editCaseForm.c_mid,
+                  }
+              }).then(function(resp){
+                  if (resp.data["code"]==300){
+                      alert(resp.data["Msg"])
+                  }else {
+                      that.$refs['editCaseForm'].resetFields();
+                      alert('编辑成功');
+                      setTimeout(() => {
+                          that.$emit("reload")
+                      }, 800);
 
-              }
-           }).catch(resp => {
-                that.re_data = resp.data
-           });
+                  }
+              }).catch(resp => {
+                  that.re_data = resp.data
+              });
+          }else {this.$message.error("请先登录")}
+
       },
 
       

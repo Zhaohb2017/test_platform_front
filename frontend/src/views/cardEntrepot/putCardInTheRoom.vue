@@ -8,7 +8,12 @@
                 :modal-append-to-body="false"
                 @closed="Closeed"
                 :visible="true">
-
+            <div class="bottom">
+                <el-tooltip class="item" effect="dark" placement="bottom-start">
+                    <div slot="content">192.168.1.28< 常德，麻将，长沙本地服务器><br/>192.168.1.153< 跑胡子本地服务器 ><br/>9011：长沙版本<br/>9007: 跑胡子本地</div>
+                    <el-button class="info_button">服务器信息说明</el-button>
+                </el-tooltip>
+            </div>
             <el-form ref="RoomDataFrom" :model="RoomDataFrom" :rules='addrules' label-width="100px">
                 <el-form-item label="服务器选择" prop="c_server">
                     <template>
@@ -16,7 +21,7 @@
                             <el-option
                                     v-for="item in serverList"
                                     :key="item.value"
-                                    :label="item.label"
+                                    :label="item.value"
                                     :value="item.label">
                             </el-option>
                         </el-select>
@@ -28,7 +33,7 @@
                             <el-option
                                     v-for="item in portList"
                                     :key="item.value"
-                                    :label="item.label"
+                                    :label="item.value"
                                     :value="item.label">
                             </el-option>
                         </el-select>
@@ -39,7 +44,7 @@
                 </el-form-item>
             </el-form>
 
-            <el-alert v-if="re_data != ''" type="error">{{ re_data }}</el-alert>
+            <el-alert v-if="re_data !== ''" type="error">{{ re_data }}</el-alert>
             <span slot="footer" class="dialog-footer">
           <el-button type="danger" @click="Cancel">取 消</el-button>
           <el-button type="danger" @click="RemoveData">清 除</el-button>
@@ -61,7 +66,14 @@
     .el-input{
         float: left;
     }
+    .bottom {
+        clear: both;
+        text-align: right;
 
+    }
+    .info_button{
+        background-color: #c6e2ff;
+    }
     .el-cascader{
         width: 100%;
     }
@@ -116,16 +128,44 @@
             return {
                 add_visible: this.visible,
                 re_data: '',
-                serverList: [{
-                    value: '选项1',
+                serverList: [
+                    {
+                    value: '湖南麻将，常德，长沙，益阳本地服务器',
                     label: '192.168.1.28'
-                },
+                    },
+                    {
+                        value: '跑胡子，四川本地服务器',
+                        label: '192.168.1.153'
+                    },
+                    {
+                        value: '娄底本地服务器',
+                        label: '192.168.1.142'
+                    },
+
                 ],
 
-                portList:[{
-                    value: '常德',
-                    label: '9010'
-                },
+                portList:[
+                    {
+                    value: '长沙',
+                    label: '9011'
+                    },
+                    {
+                        value: '常德',
+                        label: '9010'
+                    },
+                    {
+                        value: '湖南麻将，娄底',
+                        label: '9037'
+                    },
+                    {
+                        value: '跑胡子',
+                        label: '9007'
+                    },
+                    {
+                        value: '四川，益阳',
+                        label: '9050'
+                    },
+
                 ],
 
                 r_result: {
@@ -133,7 +173,6 @@
                 },
 
                 RoomDataFrom: {
-
                     port_vuale:"",
                     server_value:"",
                     room_id:"",
@@ -191,7 +230,7 @@
             },
 
             RemoveData(){
-                this.$refs['RoomDataFrom'].resetFields()
+                this.$refs['RoomDataFrom'].resetFields();
             },
 
             Cancel(){
@@ -200,27 +239,30 @@
             },
 
             SendRoom(){
-                let that = this;
-                axios({
-                    method:'post',
-                    url:'/api/addcard/send_room',
-                    params: {
-                        "c_server": this.RoomDataFrom.server_value,
-                        "c_port": this.RoomDataFrom.port_vuale,
-                        "c_roomID": this.RoomDataFrom.room_id,
-                        "c_card":this.current_data.t_card,
-                    }
+                if(this.$store.state.user != null){
+                    let that = this;
+                    axios({
+                        method:'post',
+                        url:'/api/addcard/send_room',
+                        params: {
+                            "c_server": this.RoomDataFrom.server_value,
+                            "c_port": this.RoomDataFrom.port_vuale,
+                            "c_roomID": this.RoomDataFrom.room_id,
+                            "c_card":this.current_data.t_card,
+                            "c_user":this.$store.state.user,
+                        }
 
-                }).then(function(resp){
-                    alert(resp.data);
-                    that.add_visible = false;
-                    setTimeout(() => {
-                        that.$emit("reload")
-                    }, 800);
-                }).catch(resp => {
-                    console.log('请求失败：'+resp.status+','+resp.statusText);
-                    // that.re_data = resp.data
-                });
+                    }).then(function(resp){
+                        alert(resp.data);
+                        // that.add_visible = false;
+                        // setTimeout(() => {
+                        //     that.$emit("reload")
+                        // }, 800);
+                    }).catch(resp => {
+                        console.log('请求失败：'+resp.status+','+resp.statusText);
+                        // that.re_data = resp.data
+                    });
+                }else {this.$message.error('请先登录!')}
             },
 
         }}

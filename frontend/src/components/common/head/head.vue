@@ -38,7 +38,7 @@
 // 设置顶部导航栏固定
 .el-menu-demo {
   background-color:rgb(6, 121, 84);
-  position: fixed;
+  position: absolute;
   width: 100%;
   height: 10vh;
   top: 0;
@@ -49,6 +49,7 @@
 .el-submenu{
   margin-top: 1%;
 }
+
 
 .el-menu.el-menu--horizontal {
   border-bottom: none !important;

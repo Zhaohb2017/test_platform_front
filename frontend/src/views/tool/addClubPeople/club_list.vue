@@ -4,10 +4,12 @@
         <div class="head">
             <h3>添加俱乐部人数</h3>
 
-            <el-button type="danger" @click="ChangeAddFlag" >添加俱乐部人数</el-button>
-            <el-input type="text" prefix-icon="el-icon-search" required style="width:200px;" v-model="search_data" placeholder="请输入标题搜索..."></el-input>
-            <el-button type="primary" @click="Search" >搜索</el-button>
-            <Addknowledge :visible.sync="show_flag" v-if="show_flag" @reload="reload"></Addknowledge>
+            <div class="head_fun">
+                <el-button type="danger" @click="ChangeAddFlag" >添加俱乐部人数</el-button>
+                <el-input type="text" prefix-icon="el-icon-search" required style="width:200px;" v-model="search_data" placeholder="请输入标题搜索..."></el-input>
+                <el-button type="primary" @click="Search" >搜索</el-button>
+                <Addknowledge :visible.sync="show_flag" v-if="show_flag" @reload="reload"></Addknowledge>
+            </div>
         </div>
 
 
@@ -71,10 +73,22 @@
 <style lang="less" scoped>
     .bugs{
         margin: 1%;
+        top: 0;
+    }
+
+    h3{
+        float: left;
     }
 
     .head{
-        margin-bottom: 1%;
+        float: left;
+    }
+
+    .head_fun{
+        margin-top: 10%;
+        float: left;
+        margin-left: -23.5%;
+        margin-bottom: 3%;
     }
 
     .cell{

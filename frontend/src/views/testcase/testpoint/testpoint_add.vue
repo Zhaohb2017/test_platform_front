@@ -37,44 +37,17 @@
         </el-form-item>
 
 
-
-<!--        <el-form-item label="上传图片" prop="t_imgname">-->
-<!--          <el-upload-->
-<!--                  class="fileBtn"-->
-<!--                  action="https://jsonplaceholder.typicode.com/posts/"-->
-<!--                  name="t_imgname"-->
-<!--                  accept="image/*"-->
-<!--                  :on-preview="handlePreview"-->
-<!--                  :on-remove="handleRemove"-->
-<!--                  :on-success="getAvatarSuccess"-->
-<!--                  :file-list="fileList"-->
-<!--                  list-type="picture">-->
-<!--            <el-button size="small" type="primary">点击上传</el-button>-->
-<!--            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
-<!--          </el-upload>-->
-<!--          <el-upload-->
-<!--            class="avatar-uploader"-->
-<!--            action="https://jsonplaceholder.typicode.com/posts/"-->
-<!--            :show-file-list="false"-->
-<!--            :on-success="handleAvatarSuccess"-->
-<!--            :before-upload="beforeAvatarUpload">-->
-<!--            <img v-if="imageUrl" :src="imageUrl" class="avatar">-->
-<!--            <i v-else class="el-icon-plus avatar-uploader-icon"></i>-->
-<!--          </el-upload>-->
-<!--          <el-input type="text" placeholder="请输入Bug导致的原因-询问开发人员" v-model="AddPointFrom.b_reason"></el-input>-->
-<!--        </el-form-item>-->
-
         <el-form-item label="入库装填" prop="t_storage">
           <el-radio-group v-model="AddPointFrom.t_storage">
-            <el-radio border :label="1">未入库</el-radio>
-            <el-radio border :label="0">已入库</el-radio>
+            <el-radio border label="未入库">未入库</el-radio>
+            <el-radio border label="已入库">已入库</el-radio>
           </el-radio-group>
         </el-form-item>
 
         <el-form-item label="是否失效" prop="t_usable">
           <el-radio-group v-model="AddPointFrom.t_usable">
-            <el-radio border :label="1">未失效</el-radio>
-            <el-radio border :label="0">已失效</el-radio>
+            <el-radio border label="未失效">未失效</el-radio>
+            <el-radio border label="已失效">已失效</el-radio>
           </el-radio-group>
         </el-form-item>
 
@@ -300,6 +273,20 @@
                             label: '其他'
                         }]
                     },
+                  {
+                    value: '牵手益阳棋牌',
+                    label: '牵手益阳棋牌',
+                    children: [{
+                      value: '俱乐部',
+                      label: '俱乐部'
+                    }, {
+                      value: '玩法',
+                      label: '玩法'
+                    }, {
+                      value: '其他',
+                      label: '其他'
+                    }]
+                  },
 
                     {
                         value: '牵手湖南棋牌',
@@ -343,7 +330,6 @@
             console.log("zxcxzczcxz",file);},
 
           getAvatarSuccess(res,file){
-              this.va
 
           },
 

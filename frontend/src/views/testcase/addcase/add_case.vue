@@ -278,7 +278,7 @@
             },
 
             Cancel(){
-                this.$refs['AddDataForm'].resetFields()
+                this.$refs['AddDataForm'].resetFields();
                 this.add_visible = false;
             },
             Closeed(){
@@ -295,8 +295,6 @@
                     that.caseData = resp.data.sort();
                     var jsonData = JSON.parse(JSON.stringify(that.caseData));
                     for( var item in jsonData){
-                        console.log(jsonData[item]);
-                        console.log(jsonData[item]["t_content"]);
                         var obj = {};
                         obj["value"] = jsonData[item]["t_content"];
                         obj["label"] = jsonData[item]["t_content"];
@@ -307,8 +305,9 @@
                 });
             },
             AddCase(){
-                let that = this;
-                console.log(11111111,that.testpoint);
+                if(this.$store.state.user != null){
+                    let that = this;
+                    console.log(11111111,this.$store.state.user);
                     axios({
 
                         method:'post',
@@ -324,6 +323,7 @@
                             s_pass: this.AddDataForm.s_pass,
                             s_effective:this.AddDataForm.s_effective,
                             s_remark:this.AddDataForm.s_remark,
+                            s_username:this.$store.state.user,
                         }
                     }).then(function(resp){
                         that.$refs['AddDataForm'].resetFields();
@@ -335,6 +335,8 @@
                     }).catch(resp => {
                         that.re_data = resp.data
                     });
+                }else {this.$message.error("请先登录.")}
+
 
             }
 

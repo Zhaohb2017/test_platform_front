@@ -3,11 +3,13 @@
         <!-- 添加、搜索功能 -->
         <div class="head">
             <h3>知识技能库</h3>
-            <el-button type="danger" @click="getKnowledgeList">刷新数据</el-button>
-            <el-button type="danger" @click="ChangeAddFlag" >添加知识</el-button>
-            <el-input type="text" prefix-icon="el-icon-search" required style="width:200px;" v-model="search_data" placeholder="请输入标题搜索..."></el-input>
-            <el-button type="primary" @click="Search" >搜索</el-button>
-            <Addknowledge :visible.sync="show_flag" v-if="show_flag" @reload="reload"></Addknowledge>
+            <div class="head_fun">
+                <el-button type="danger" @click="getKnowledgeList">刷新数据</el-button>
+                <el-button type="danger" @click="ChangeAddFlag" >添加知识</el-button>
+                <el-input type="text" prefix-icon="el-icon-search" required style="width:200px;" v-model="search_data" placeholder="请输入标题搜索..."></el-input>
+                <el-button type="primary" @click="Search" >搜索</el-button>
+                <Addknowledge :visible.sync="show_flag" v-if="show_flag" @reload="reload"></Addknowledge>
+            </div>
         </div>
 
 
@@ -73,10 +75,22 @@
 <style lang="less" scoped>
     .bugs{
         margin: 1%;
+        top: 0;
+    }
+
+    h3{
+        float: left;
     }
 
     .head{
-        margin-bottom: 1%;
+        float: left;
+    }
+
+    .head_fun{
+        margin-top: 10%;
+        float: left;
+        margin-left: -16%;
+        margin-bottom: 5%;
     }
 
     .cell{
@@ -120,6 +134,7 @@
     import axios from 'axios'
     import Addknowledge from './skill_add'
     import EditSkills from './skill_edit'
+    import {timeFormat} from '../../../../libs/time.js'
     export default {
         components:{
             Addknowledge,
@@ -194,8 +209,12 @@
                     url:'/api/knowledge/s_list',
                 }).then(function(resp){
                     that.showSkillData = resp.data.sort();
+                    console.log("XXXXXX",that.showSkillData, typeof that.showSkillData);
                     that.showPageData = that.showSkillData.slice(0, that.current_page_size);
-                    console.log("showData: ", showSkillData)
+                    for(var i in that.showPageData){
+                        console.log("hhhhhhhhhhh",that.showSkillData[i], typeof that.showSkillData[i]);
+                        that.showPageData[i]["t_date"] = timeFormat(that.showPageData[i]["t_date"]);
+                    }
 
                 }).catch(resp => {
                     console.log('请求失败：'+resp.status+','+resp.statusText);
@@ -211,11 +230,8 @@
             //修改修改Bug实例弹窗显示状态
             ChangeEditFlag(index,row){
                 if(this.$store.state.user != null){
-                    let new_data = JSON.parse(JSON.stringify(row))
-                    console.log(index, 111111111111,new_data)
-                    this.current_data = new_data
-                    console.log(33333,this.current_data)
-
+                    let new_data = JSON.parse(JSON.stringify(row));
+                    this.current_data = new_data;
                     this.edit_show_flag = true;
                 }else{
                     this.$message.error("请先登录.")

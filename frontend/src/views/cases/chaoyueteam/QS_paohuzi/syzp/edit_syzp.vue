@@ -2,7 +2,7 @@
     <div v-if="edit_visible" class="lg">
         <el-dialog
                 title="编辑测试用例 - 邵阳字牌"
-                width="60%"
+                width="50%"
                 center
                 :show-close = "false"
                 :modal-append-to-body="false"
@@ -26,12 +26,14 @@
                 </el-table-column>
 
                 <el-form-item label="日 期" prop="c_date">
-                    <el-date-picker type="text" style="width: 100%;" disabled placeholder="选择日期" v-model="editCaseForm.c_date"></el-date-picker>
+                    <el-date-picker type="datetime"
+                                    style="width: 100%;"
+                                    disabled
+                                    placeholder="选择日期"
+                                    v-model="editCaseForm.c_date"></el-date-picker>
                 </el-form-item>
 
-                <el-form-item label="提 交 人" prop="c_name">
-                    <el-input type="text" placeholder="请输入提交人信息" disabled v-model="editCaseForm.c_name"></el-input>
-                </el-form-item>
+
                 <el-form-item label="用户mid" prop="c_mid">
                     <el-input type="text" placeholder="输入用户mid" v-model="editCaseForm.c_mid"></el-input>
                 </el-form-item>
@@ -98,7 +100,7 @@
             </el-form>
             <el-form :model="operationForm"
                      ref="operationForm"
-                     label-width="130px"
+                     label-width="80px"
                      center
                      size="small">
                 <el-form-item label="测试步骤"  prop="servin" >
@@ -109,7 +111,7 @@
                                 <template slot-scope="scope">
                                     <el-select v-model="scope.row.users" clearable  >
                                         <el-option
-                                                v-for="item in users"
+                                                v-for="item in users.slice(0,editCaseForm.c_option.o_player)"
                                                 :key="item.value"
                                                 :label="item.text"
                                                 :value="item.value">
@@ -131,7 +133,22 @@
                             </el-table-column>
                             <el-table-column prop="card" label="牌">
                                 <template slot-scope="scope">
-                                    <el-input size="mini" v-model="scope.row.card"  ></el-input>
+                                    <el-select v-model="scope.row.card" multiple clearable placeholder="请选择牌型" v-show="getOption(operationList[scope.$index].operation) === true" >
+                                        <el-option
+                                                v-for="item in card_type"
+                                                :key="item.value"
+                                                :label="item.text"
+                                                :value="item.value">
+                                        </el-option>
+                                    </el-select>
+                                    <el-select v-model="scope.row.in_jiachui" placeholder="请选择是否加锤" v-show="operationList[scope.$index].operation === '加锤' ">
+                                        <el-option
+                                                v-for="item in jiaochui_type"
+                                                :key="item.value"
+                                                :label="item.text"
+                                                :value="item.value">
+                                        </el-option>
+                                    </el-select>
                                 </template>
                             </el-table-column>
                             <el-table-column fixed="right"  label="操作">
@@ -206,6 +223,91 @@
                     {text:'吃牌',value:'吃牌'},
                     {text:'出牌',value:'出牌'},
                     {text:'过牌',value:'过牌'},
+                    {text:'加锤',value:'加锤'},
+                ],
+                operation_list:['碰牌', '吃牌', '出牌'],
+                jiaochui_type:[{ text: '是',value: '是'},{ text: '否',value: '否'}],
+                card_type:[
+                    {
+                        text: '1s',
+                        value: '1s'
+                    },
+                    {
+                        text: '2s',
+                        value: '2s'
+                    },          {
+                        text: '3s',
+                        value: '3s'
+                    },
+                    {
+                        text: '4s',
+                        value: '4s'
+                    },
+                    {
+                        text: '5s',
+                        value: '5s'
+                    },
+                    {
+                        text: '6s',
+                        value: '6s'
+                    },
+                    {
+                        text: '7s',
+                        value: '7s'
+                    },
+                    {
+                        text: '8s',
+                        value: '8s'
+                    },
+                    {
+                        text: '9s',
+                        value: '9s'
+                    },
+                    {
+                        text: 'Ts',
+                        value: 'Ts'
+                    },
+                    {
+                        text: '1b',
+                        value: '1b'
+                    },
+                    {
+                        text: '2b',
+                        value: '2b'
+                    },
+                    {
+                        text: '3b',
+                        value: '3b'
+                    },
+                    {
+                        text: '4b',
+                        value: '4b'
+                    },
+                    {
+                        text: '5b',
+                        value: '5b'
+                    },
+                    {
+                        text: '6b',
+                        value: '6b'
+                    },
+                    {
+                        text: '7b',
+                        value: '7b'
+                    },
+                    {
+                        text: '8b',
+                        value: '8b'
+                    },
+                    {
+                        text: '9b',
+                        value: '9b'
+                    },
+                    {
+                        text: 'Tb',
+                        value: 'Tb'
+                    },
+
                 ],
                 operationForm:{},
                 editCaseForm: {
@@ -219,7 +321,7 @@
                 this.editCaseForm = this.current_data;
                 var dataObj = this.current_data.c_option;
                 this.operationList = this.editCaseForm.c_operate;
-                if(this.editCaseForm.c_option.o_player == 2){
+                if(this.editCaseForm.c_option.o_player === 2){
                     this.ShowFlag=true;
                 }else{
                     this.ShowFlag=false;
@@ -296,9 +398,16 @@
             handleClose(done) {
                 this.Closeed();
             },
+            getOption(val){
+                for(var i in this.operation_list){
+                    if (val === this.operation_list[i]){
+                        return true
+                    }
+                }
+            },
             createRoomType(val){
                 console.log("xxxxxxx",val);
-                if(val=="俱乐部创房"){
+                if(val === "俱乐部创房"){
                     this.show_club_id = true;
                 }else{
                     this.show_club_id = false;
@@ -317,7 +426,7 @@
             },
 
             getValue(val){
-                if(val==2){
+                if(val === 2){
                     this.ShowFlag = true;
                 }else{
                     this.doublePlusNewShowFlag = false;
@@ -330,41 +439,44 @@
             },
 
             EditBugs(){
-                let that = this;
-                console.log(this.editCaseForm);
-                axios({
-                    method:'post',
-                    url:'/api/cases/c_edit',
-                    data: {
-                        c_id: this.editCaseForm.c_id,
-                        c_date: this.editCaseForm.c_date,
-                        c_name: this.editCaseForm.c_name,
-                        c_play: this.editCaseForm.c_play,
-                        c_purpose: this.editCaseForm.c_purpose,
-                        c_option: this.editCaseForm.c_option,
-                        c_operate: this.operationList,
-                        c_cards: this.editCaseForm.c_cards,
-                        c_remake: this.editCaseForm.c_remake,
-                        c_file_name: this.editCaseForm.c_file_name,
-                        c_is_local: this.editCaseForm.c_is_local,
-                        c_project: this.editCaseForm.c_project,
-                        c_account:this.editCaseForm.c_mid,
-                    }
-                }).then(function(resp){
-                    if (resp.data["code"]==300){
-                        alert(resp.data["Msg"])
-                    }else {
-                        that.$refs['editCaseForm'].resetFields();
-                        alert('编辑成功');
+                if(this.$store.state.user != null){
+                    let that = this;
 
-                        setTimeout(() => {
-                            that.$emit("reload")
-                        }, 800);
+                    axios({
+                        method:'post',
+                        url:'/api/cases/c_edit',
+                        data: {
+                            c_id: this.editCaseForm.c_id,
+                            c_date: this.editCaseForm.c_date,
+                            c_name: this.editCaseForm.c_name,
+                            c_play: this.editCaseForm.c_play,
+                            c_purpose: this.editCaseForm.c_purpose,
+                            c_option: this.editCaseForm.c_option,
+                            c_operate: this.operationList,
+                            c_cards: this.editCaseForm.c_cards,
+                            c_remake: this.editCaseForm.c_remake,
+                            c_file_name: this.editCaseForm.c_file_name,
+                            c_is_local: this.editCaseForm.c_is_local,
+                            c_project: this.editCaseForm.c_project,
+                            c_account:this.editCaseForm.c_mid,
+                        }
+                    }).then(function(resp){
+                        if (resp.data["code"]==300){
+                            alert(resp.data["Msg"])
+                        }else {
+                            that.$refs['editCaseForm'].resetFields();
+                            alert('编辑成功');
 
-                    }
-                }).catch(resp => {
-                    that.re_data = resp.data
-                });
+                            setTimeout(() => {
+                                that.$emit("reload")
+                            }, 800);
+
+                        }
+                    }).catch(resp => {
+                        that.re_data = resp.data
+                    });
+                }else {this.$message.error('请先登录')}
+
             },
 
 

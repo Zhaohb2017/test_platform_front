@@ -26,15 +26,17 @@
                 </el-table-column>
 
                 <el-form-item label="日 期" prop="c_date">
-                    <el-date-picker type="text" style="width: 100%;" disabled placeholder="选择日期" v-model="editCaseForm.c_date"></el-date-picker>
+                    <el-date-picker type="datetime"
+                                    style="width: 100%;"
+                                    disabled
+                                    placeholder="选择日期"
+                                    v-model="editCaseForm.c_date"></el-date-picker>
                 </el-form-item>
 
                 <el-form-item label="提 交 人" prop="c_name">
                     <el-input type="text" placeholder="请输入提交人信息" disabled v-model="editCaseForm.c_name"></el-input>
                 </el-form-item>
-                <el-form-item label="用户mid" prop="c_mid">
-                    <el-input type="text" placeholder="输入用户mid" v-model="editCaseForm.c_mid"></el-input>
-                </el-form-item>
+
                 <el-form-item label="测试目的" prop="c_purpose">
                     <el-input type="text" placeholder="请输入测试目的"  v-model="editCaseForm.c_purpose"></el-input>
                 </el-form-item>
@@ -139,7 +141,7 @@
             </el-form>
             <el-form :model="operationForm"
                      ref="operationForm"
-                     label-width="130px"
+                     label-width="80px"
                      center
                      size="small">
                 <el-form-item label="测试步骤"  prop="servin" >
@@ -172,7 +174,14 @@
                             </el-table-column>
                             <el-table-column prop="card" label="牌">
                                 <template slot-scope="scope">
-                                    <el-input size="mini" v-model="scope.row.card"  ></el-input>
+                                    <el-select v-model="scope.row.card" multiple placeholder="请选择牌型">
+                                        <el-option
+                                                v-for="item in card_type"
+                                                :key="item.value"
+                                                :label="item.text"
+                                                :value="item.value">
+                                        </el-option>
+                                    </el-select>
                                 </template>
                             </el-table-column>
                             <el-table-column fixed="right"  label="操作">
@@ -248,6 +257,215 @@
                 operation_type:[
                     {text:'出牌',value:'出牌'},
                     {text:'过牌',value:'过牌'},
+                ],
+                card_type:[
+
+                    {
+                        text: '2s',
+                        value: '2s'
+                    },          {
+                        text: '3s',
+                        value: '3s'
+                    },
+                    {
+                        text: '4s',
+                        value: '4s'
+                    },
+                    {
+                        text: '5s',
+                        value: '5s'
+                    },
+                    {
+                        text: '6s',
+                        value: '6s'
+                    },
+                    {
+                        text: '7s',
+                        value: '7s'
+                    },
+                    {
+                        text: '8s',
+                        value: '8s'
+                    },
+                    {
+                        text: '9s',
+                        value: '9s'
+                    },
+                    {
+                        text: 'Ts',
+                        value: 'Ts'
+                    },
+                    {
+                        text: 'Js',
+                        value: 'Js'
+                    },
+                    {
+                        text: 'Qs',
+                        value: 'Qs'
+                    },
+                    {
+                        text: 'Ks',
+                        value: 'Ks'
+                    },
+                    {
+                        text: 'As',
+                        value: 'As'
+                    },
+                    {
+                        text: '2h',
+                        value: '2h'
+                    },          {
+                        text: '3h',
+                        value: '3h'
+                    },
+                    {
+                        text: '4h',
+                        value: '4h'
+                    },
+                    {
+                        text: '5h',
+                        value: '5h'
+                    },
+                    {
+                        text: '6h',
+                        value: '6h'
+                    },
+                    {
+                        text: '7h',
+                        value: '7h'
+                    },
+                    {
+                        text: '8h',
+                        value: '8h'
+                    },
+                    {
+                        text: '9h',
+                        value: '9h'
+                    },
+                    {
+                        text: 'Th',
+                        value: 'Th'
+                    },
+                    {
+                        text: 'Jh',
+                        value: 'Jh'
+                    },
+                    {
+                        text: 'Qh',
+                        value: 'Qh'
+                    },
+                    {
+                        text: 'Kh',
+                        value: 'Kh'
+                    },
+                    {
+                        text: 'Ah',
+                        value: 'Ah'
+                    },
+                    {
+                        text: '2c',
+                        value: '2c'
+                    },          {
+                        text: '3c',
+                        value: '3c'
+                    },
+                    {
+                        text: '4c',
+                        value: '4c'
+                    },
+                    {
+                        text: '5c',
+                        value: '5c'
+                    },
+                    {
+                        text: '6c',
+                        value: '6c'
+                    },
+                    {
+                        text: '7c',
+                        value: '7c'
+                    },
+                    {
+                        text: '8c',
+                        value: '8c'
+                    },
+                    {
+                        text: '9c',
+                        value: '9c'
+                    },
+                    {
+                        text: 'Tc',
+                        value: 'Tc'
+                    },
+                    {
+                        text: 'Jc',
+                        value: 'Jc'
+                    },
+                    {
+                        text: 'Qc',
+                        value: 'Qc'
+                    },
+                    {
+                        text: 'Kc',
+                        value: 'Kc'
+                    },
+                    {
+                        text: 'Ac',
+                        value: 'Ac'
+                    },
+                    {
+                        text: '2d',
+                        value: '2d'
+                    },          {
+                        text: '3d',
+                        value: '3d'
+                    },
+                    {
+                        text: '4d',
+                        value: '4d'
+                    },
+                    {
+                        text: '5d',
+                        value: '5d'
+                    },
+                    {
+                        text: '6d',
+                        value: '6d'
+                    },
+                    {
+                        text: '7d',
+                        value: '7d'
+                    },
+                    {
+                        text: '8d',
+                        value: '8d'
+                    },
+                    {
+                        text: '9d',
+                        value: '9d'
+                    },
+                    {
+                        text: 'Td',
+                        value: 'Td'
+                    },
+                    {
+                        text: 'Jd',
+                        value: 'Jd'
+                    },
+                    {
+                        text: 'Qd',
+                        value: 'Qd'
+                    },
+                    {
+                        text: 'Kd',
+                        value: 'Kd'
+                    },
+                    {
+                        text: 'Ad',
+                        value: 'Ad'
+                    },
+
+
                 ],
                 users:[{text:'玩家1',value:'玩家1'},{text:'玩家2',value:'玩家2'},{text:'玩家3',value:'玩家3'},{text:'玩家4',value:'玩家4'}],
                 roomType:[{text:'普通创房',value:'普通创房'},{text:'俱乐部创房',value:'俱乐部创房'}],
@@ -375,40 +593,42 @@
             },
 
             EditBugs(){
-                let that = this;
-                console.log(this.editCaseForm);
-                axios({
-                    method:'post',
-                    url:'/api/cases/c_edit',
-                    data: {
-                        c_id: this.editCaseForm.c_id,
-                        c_date: this.editCaseForm.c_date,
-                        c_name: this.editCaseForm.c_name,
-                        c_play: this.editCaseForm.c_play,
-                        c_purpose: this.editCaseForm.c_purpose,
-                        c_option: this.editCaseForm.c_option,
-                        c_operate: this.operationList,
-                        c_cards: this.editCaseForm.c_cards,
-                        c_remake: this.editCaseForm.c_remake,
-                        c_file_name: this.editCaseForm.c_file_name,
-                        c_is_local: this.editCaseForm.c_is_local,
-                        c_project: this.editCaseForm.c_project,
-                        c_account:this.editCaseForm.c_mid,
-                    }
-                }).then(function(resp){
-                    if (resp.data["code"]==300){
-                        alert(resp.data["Msg"])
-                    }else {
-                        that.$refs['editCaseForm'].resetFields();
-                        alert('编辑成功');
-                        setTimeout(() => {
-                            that.$emit("reload")
-                        }, 800);
+                if(this.$store.state.user != null){
+                    let that = this;
+                    axios({
+                        method:'post',
+                        url:'/api/cases/c_edit',
+                        data: {
+                            c_id: this.editCaseForm.c_id,
+                            c_date: this.editCaseForm.c_date,
+                            c_name: this.$store.state.user,
+                            c_play: this.editCaseForm.c_play,
+                            c_purpose: this.editCaseForm.c_purpose,
+                            c_option: this.editCaseForm.c_option,
+                            c_operate: this.operationList,
+                            c_cards: this.editCaseForm.c_cards,
+                            c_remake: this.editCaseForm.c_remake,
+                            c_file_name: this.editCaseForm.c_file_name,
+                            c_is_local: this.editCaseForm.c_is_local,
+                            c_project: this.editCaseForm.c_project,
+                            c_account:this.editCaseForm.c_mid,
+                        }
+                    }).then(function(resp){
+                        if (resp.data["code"]==300){
+                            alert(resp.data["Msg"])
+                        }else {
+                            that.$refs['editCaseForm'].resetFields();
+                            alert('编辑成功');
+                            setTimeout(() => {
+                                that.$emit("reload")
+                            }, 800);
 
-                    }
-                }).catch(resp => {
-                    that.re_data = resp.data
-                });
+                        }
+                    }).catch(resp => {
+                        that.re_data = resp.data
+                    });
+                }else {this.$message.error("请先登录")}
+
             },
 
 

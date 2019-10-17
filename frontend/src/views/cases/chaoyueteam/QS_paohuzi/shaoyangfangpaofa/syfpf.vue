@@ -4,11 +4,21 @@
         <!-- 添加、搜索功能 -->
         <div class="head">
             <h3>邵阳放炮罚</h3>
-            <el-button type="danger" @click="getBugsList">刷新数据</el-button>
-            <el-button type="danger" @click="ChangeAddFlag" >添加测试用例</el-button>
-            <el-input type="text" prefix-icon="el-icon-search" required style="width:200px;" v-model="search_data" placeholder="请输入关键字搜索..."></el-input>
-            <el-button type="primary" @click="Search" >搜索</el-button>
-            <AddBugs :visible.sync="show_flag" v-if="show_flag" @reload="reload"></AddBugs>
+            <div class="head_fun">
+                <el-button type="danger" @click="getBugsList">刷新数据</el-button>
+                <el-button type="danger" @click="ChangeAddFlag" >添加测试用例</el-button>
+                <el-select v-model="selected_item" multiple placeholder="请选择提交人" collapse-tags>
+                    <el-option
+                            v-for="item in select_option"
+                            :key="item.name"
+                            :label="item.value"
+                            :value="item.value"
+                    >
+                    </el-option>
+                </el-select>
+                <el-button type="primary" @click="Search" >搜索</el-button>
+                <AddBugs :visible.sync="show_flag" v-if="show_flag" @reload="reload"></AddBugs>
+            </div>
         </div>
 
 
@@ -35,28 +45,36 @@
             <el-table-column prop="c_file_name" v-if="false">
             </el-table-column>
 
-            <el-table-column label="日期" width="130" prop="c_date" sortable header-align="center" align="center">
+            <el-table-column label="日期" width="110" prop="show_time" sortable header-align="center" align="center">
                 <template slot-scope="scope">
-                    <i class="el-icon-time"></i>
-                    <span style="margin-left: 10px">{{ scope.row.c_date }}</span>
+                    <span style="margin-left: 10px">{{ scope.row.show_time }}</span>
                 </template>
             </el-table-column>
 
             <el-table-column label="提交人" width="100" prop="c_name" header-align="center" align="center">
             </el-table-column>
-            <el-table-column label="用户mid" width="100" prop="c_mid" header-align="center" align="center">
+            <el-table-column label="用户mid" width="100" prop="c_user" header-align="center" align="center">
+                <template slot-scope="scope">
+                    <p v-for="item in scope.row.c_user" style="margin:0;text-align: justify">{{item.name}}: {{item.value}}</p>
+                </template>
             </el-table-column>
 
             <el-table-column label="测试目的" width="190" header-align="center" align="center" prop="c_purpose">
             </el-table-column>
 
             <el-table-column label="创房选项" width="290" min-width="180" header-align="center" prop="c_RoomOptions">
+                <template slot-scope="scope">
+                    <p v-for="item in scope.row.c_RoomOptions" style="margin:0;">{{item.name}}: {{item.value}}</p>
+                </template>
             </el-table-column>
 
             <el-table-column label="做牌数据" width="290" min-width="180" header-align="center" prop="c_cards">
             </el-table-column>
 
             <el-table-column label="操作步骤" width="290" min-width="180" header-align="center" prop="c_step">
+                <template slot-scope="scope">
+                    <p v-for="item in scope.row.c_step" style="margin:0;">{{item.users}}：{{item.operation}}-->{{item.card}}</p>
+                </template>
             </el-table-column>
 
             <el-table-column label="备注" width="130" align="center" prop="c_remake">
@@ -98,10 +116,22 @@
 <style lang="less" scoped>
     .bugs{
         margin: 1%;
+        top: 0;
+    }
+
+    h3{
+        float: left;
     }
 
     .head{
-        margin-bottom: 1%;
+        float: left;
+    }
+
+    .head_fun{
+        margin-top: 10%;
+        float: left;
+        margin-left: -16%;
+        margin-bottom: 3%;
     }
 
     .cell{
@@ -146,6 +176,7 @@
     import AddBugs from './add_syfpf'
     import EditBugs from './edit_syfpf'
     import Reports from '../../../../reports/report'
+    import {timeFormat,roomDataFormat,midFormat,remove,get_dict} from '../../../../../../libs/time.js'
     import { truncate } from 'fs';
     import { start } from 'repl';
     export default {
@@ -160,10 +191,6 @@
                 show_flag: false,
                 edit_show_flag: false,
                 report_show_flag: false,
-
-                // 搜索内容
-                search_data: "",
-
                 // 编辑子组件传递数据类型
                 current_data:{},
 
@@ -189,7 +216,8 @@
                 // 结束展示的index
                 end_index: 0,
 
-                search: ''
+                select_option: [],
+                selected_item: [],
             }
         },
 
@@ -227,163 +255,174 @@
                     }
                 }).then(function(resp){
                     that.caseData = resp.data.sort();
-                    that.showcaseData = that.caseData.slice(0, that.current_page_size);
-                    for (var i in that.showcaseData){
-                        that.showcaseData[i]["c_step"] = JSON.stringify(that.showcaseData[i]["c_operate"]); //操作步骤
-                        that.showcaseData[i]["c_RoomOptions"] = JSON.stringify(that.showcaseData[i]["c_option"]) //创房选项
+                    // 获取人员列表去重操作
+                    that.select_option = remove(that.caseData);
+                    for (var i in that.caseData){
+                        that.setp_list = that.caseData[i]["c_operate"];
+                        that.caseData[i]["c_step"] = (that.caseData[i]["c_operate"]); //操作步骤
+                        that.caseData[i]["c_user"] = (midFormat(that.caseData[i]["c_mid"]));
+                        that.caseData[i]["c_RoomOptions"] = roomDataFormat(that.caseData[i]["c_option"]); //创房选项
+                        that.caseData[i]["show_time"] = timeFormat(that.caseData[i]["c_date"]);
                     }
+                    that.showcaseData = that.caseData.slice(0, that.current_page_size);
+
+
+            }).catch(resp => {
+        console.log('请求失败：'+resp.status+','+resp.statusText);
+    });
+    },
+
+    //修改添加Bug实例弹窗显示状态
+    ChangeAddFlag() {
+        this.show_flag = true;
+    },
+
+    //修改修改Bug实例弹窗显示状态
+    ChangeEditFlag(row){
+        if(this.$store.state.user != null){
+            let new_data = JSON.parse(JSON.stringify(row));
+            this.current_data = new_data;
+            this.edit_show_flag = true;
+        }else{
+            this.$message.error("请先登录.")
+        }
+    },
+
+
+    // 删除bug数据
+    handleDelete(index, row) {
+        if(this.$store.state.user != null){
+            if(confirm("确认要删除么?")){
+                let c_id = row['c_id']
+                console.log(index, c_id);
+                let that = this;
+                axios({
+                    method:'get',
+                    url:'/api/cases/c_del',
+                    params: {
+                        'c_id': c_id
+                    }
+                }).then(function(resp){
+                    // that.caseData = resp.data.sort();
+                    // that.showcaseData = that.caseData.slice(0, that.current_page_size)
+                    that.getBugsList();
 
                 }).catch(resp => {
                     console.log('请求失败：'+resp.status+','+resp.statusText);
                 });
-            },
-
-            //修改添加Bug实例弹窗显示状态
-            ChangeAddFlag() {
-                this.show_flag = true;
-            },
-
-            //修改修改Bug实例弹窗显示状态
-            ChangeEditFlag(row){
-                if(this.$store.state.user != null){
-                    let new_data = JSON.parse(JSON.stringify(row));
-                    this.current_data = new_data;
-                    this.edit_show_flag = true;
-                }else{
-                    this.$message.error("请先登录.")
-                }
-            },
-
-
-            // 删除bug数据
-            handleDelete(index, row) {
-                if(this.$store.state.user != null){
-                    if(confirm("确认要删除么?")){
-                        let c_id = row['c_id']
-                        console.log(index, c_id);
-                        let that = this;
-                        axios({
-                            method:'get',
-                            url:'/api/cases/c_del',
-                            params: {
-                                'c_id': c_id
-                            }
-                        }).then(function(resp){
-                            // that.caseData = resp.data.sort();
-                            // that.showcaseData = that.caseData.slice(0, that.current_page_size)
-                            that.getBugsList();
-
-                        }).catch(resp => {
-                            console.log('请求失败：'+resp.status+','+resp.statusText);
-                        });
-                    }
-                }else{
-                    this.$message.error("请先登录.")
-                }
-
-            },
-
-            RunCase(index, row){
-                if(this.$store.state.user != null){
-                    let c_id = row['c_id']
-                    let that = this;
-
-                    // that.isRunning = row.c_id
-                    that.$message.success("用例正在运行.")
-                    axios({
-                        method:'get',
-                        url:'/api/cases/run',
-                        params: {
-                            'c_id': c_id
-                        }
-                    }).then(function(resp){
-                        console.log("resp: %s", resp.data)
-                        that.$message.success(resp.data)
-                    }).catch(resp => {
-                        that.$message.error(resp.data)
-                    });
-                }else{
-                    this.$message.error("请先登录.")
-                }
-
-            },
-
-            ReadReports(index, row){
-                let r_id = row['c_id']
-                let that = this;
-                axios({
-                    method:'get',
-                    url:'/api/cases/r_list',
-                    params: {
-                        'r_id': r_id
-                    }
-                }).then(function(resp){
-                    console.log(resp.data)
-                    that.report_current_data = resp.data.sort();
-                    that.report_show_flag = true
-                }).catch(resp => {
-                    that.$message.error('请求失败：'+resp.status+','+resp.statusText);
-                });
-            },
-
-            Search(){
-                let that = this;
-                if( that.search_data == ''){
-                    alert("请输入要搜索的内容.")
-                }else{
-                    console.log("search: %s", that.search_data)
-                    axios({
-                        method:'get',
-                        url:'/api/cases/search',
-                        params: {
-                            'c_name': that.search_data
-                        }
-                    }).then(function(resp){
-                        that.caseData = resp.data.sort();
-                        that.showcaseData = that.caseData.slice(0, that.current_page_size)
-                        console.log("data", that.caseData)
-
-                    }).catch(resp => {
-                        console.log('请求失败：'+resp.status+','+resp.statusText);
-                    });
-                }
-            },
-
-
-
-            tableRowClassName({row, rowIndex}) {
-                if (rowIndex % 2 === 1) {
-                    return 'success-row';
-                }
-                return '';
-            },
-
-            // 修改每页显示行数
-            handleSizeChange(val) {
-                console.log(`每页 ${val} 条`);
-                this.current_page_size = val
-                this.showcaseData = this.caseData.slice(0, val)
-            },
-
-            //跳转第几页
-            handleCurrentChange(val) {
-                let count = this.current_page_size;
-                let n = val;
-                let end_index = count * n - 1;
-                let start_index;
-                if(n == 1){
-                    start_index = 0;
-                    end_index = count;
-                }else{
-                    end_index = end_index + 1;
-                    start_index = end_index - count;
-                }
-                this.showcaseData = this.caseData.slice(start_index, end_index)
-
-                //   this.caseData = (this.caseData).slice((index * val), this.caseData.length)
-                this.currentPage = val
-                console.log(`当前页: ${this.currentPage}`);
-            },
+            }
+        }else{
+            this.$message.error("请先登录.")
         }
+
+    },
+
+    RunCase(index, row){
+        if(this.$store.state.user != null){
+            let c_id = row['c_id']
+            let that = this;
+
+            // that.isRunning = row.c_id
+            that.$message.success("用例正在运行.")
+            axios({
+                method:'get',
+                url:'/api/cases/run',
+                params: {
+                    'c_id': c_id
+                }
+            }).then(function(resp){
+                console.log("resp: %s", resp.data)
+                that.$message.success(resp.data)
+            }).catch(resp => {
+                that.$message.error(resp.data)
+            });
+        }else{
+            this.$message.error("请先登录.")
+        }
+
+    },
+
+    ReadReports(index, row){
+        let r_id = row['c_id']
+        let that = this;
+        axios({
+            method:'get',
+            url:'/api/cases/r_list',
+            params: {
+                'r_id': r_id
+            }
+        }).then(function(resp){
+            that.report_current_data = resp.data.sort();
+            for (var i in that.report_current_data){
+                that.report_current_data[i]["r_end_time"] = timeFormat(that.report_current_data[i]["r_end_time"]);
+            }
+            that.report_show_flag = true
+        }).catch(resp => {
+            that.$message.error('请求失败：'+resp.status+','+resp.statusText);
+        });
+    },
+
+    Search(){
+        let that = this;
+        var data_dict = get_dict(that.selected_item, that.select_option);
+        axios({
+            method:'get',
+            url:'/api/cases/search',
+            params: {
+                'data': data_dict,
+                'c_play': '邵阳放炮罚'
+            }
+        }).then(function(resp){
+            that.caseData = resp.data.sort();
+            for (var i in that.caseData){
+                that.setp_list = that.caseData[i]["c_operate"];
+                that.caseData[i]["c_step"] = (that.caseData[i]["c_operate"]); //操作步骤
+                that.caseData[i]["c_user"] = (midFormat(that.caseData[i]["c_mid"]));
+                that.caseData[i]["c_RoomOptions"] = roomDataFormat(that.caseData[i]["c_option"]); //创房选项
+                that.caseData[i]["show_time"] = timeFormat(that.caseData[i]["c_date"]);
+            }
+            that.showcaseData = that.caseData.slice(0, that.current_page_size)
+        }).catch(resp => {
+            console.log('请求失败：'+resp.status+','+resp.statusText);
+        });
+
+    },
+
+
+
+    tableRowClassName({row, rowIndex}) {
+        if (rowIndex % 2 === 1) {
+            return 'success-row';
+        }
+        return '';
+    },
+
+    // 修改每页显示行数
+    handleSizeChange(val) {
+        console.log(`每页 ${val} 条`);
+        this.current_page_size = val
+        this.showcaseData = this.caseData.slice(0, val)
+    },
+
+    //跳转第几页
+    handleCurrentChange(val) {
+        let count = this.current_page_size;
+        let n = val;
+        let end_index = count * n - 1;
+        let start_index;
+        if(n == 1){
+            start_index = 0;
+            end_index = count;
+        }else{
+            end_index = end_index + 1;
+            start_index = end_index - count;
+        }
+        this.showcaseData = this.caseData.slice(start_index, end_index)
+
+        //   this.caseData = (this.caseData).slice((index * val), this.caseData.length)
+        this.currentPage = val
+        console.log(`当前页: ${this.currentPage}`);
+    },
+    }
     }
 </script>

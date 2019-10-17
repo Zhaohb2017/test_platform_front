@@ -1,60 +1,64 @@
 
 <template>
-    <div class="bugs" id="orderFullScreen">
+    <div class="bugs" id="orderFullScreen" :style="fullHeight">
         <!-- 添加、搜索功能 -->
         <div class="head">
             <h3>用例仓库</h3>
-            <el-button type="danger" @click="getTestCaseList">刷新数据</el-button>
-            <el-button type="danger" @click="ChangeAddFlag" >添加用例</el-button>
-            <el-input type="text" prefix-icon="el-icon-search" required style="width:260px;" v-model="search_data" placeholder="支持版本,模块,测试点模糊查询"></el-input>
-            <el-button type="primary" @click="Search" >搜索</el-button>
-            <input type="file" class="case"  ref="upload" accept=".xls,.xlsx" @change="readExcel" placeholder="file"></input>
-            <el-button type="primary" @click="batchProduce" size="small" round>批量上传<i class="el-icon-download el-icon--right"></i></el-button>
-            <el-button type="primary" @click="downloadExcel" size="small" round>下载数据<i class="el-icon-upload2 el-icon--right"></i></el-button>
-<!--            <el-button type="danger" style="float: right;" size="small" @click="deletePageData" plain>全删</el-button>-->
-            <Addknowledge :visible.sync="show_flag" v-if="show_flag" @reload="reload"></Addknowledge>
+            <div class="head_fun">
+                <el-button type="danger" @click="getTestCaseList">刷新数据</el-button>
+                <el-button type="danger" @click="ChangeAddFlag" >添加用例</el-button>
+                <el-input type="text" prefix-icon="el-icon-search" required style="width:150px;" v-model="search_data_versions" placeholder="版本查询"></el-input>
+                <el-input type="text" prefix-icon="el-icon-search" required style="width:150px;" v-model="search_data_module" placeholder="模块查询"></el-input>
+                <el-input type="text" prefix-icon="el-icon-search" required style="width:150px;" v-model="search_data_testpoint" placeholder="测试点查询"></el-input>
+                <el-button type="primary" @click="Search" >搜索</el-button>
+                <input type="file" class="case"  ref="upload" accept=".xls,.xlsx" @change="readExcel" placeholder="file" />
+                <el-button type="primary"  @click="batchProduce" size="small" round>批量上传<i class="el-icon-download el-icon--right"></i></el-button>
+                <el-button type="primary"  @click="downloadExcel" size="small" round>下载数据<i class="el-icon-upload2 el-icon--right"></i></el-button>
+                <el-button type="danger"  size="small" v-show="delete_btn" @click="deletePageData" plain >全删</el-button>
+                <Addknowledge :visible.sync="show_flag" v-if="show_flag" @reload="reload"></Addknowledge>
+            </div>
         </div>
        <!-- 展示列表  -->
-        <el-scrollbar class="page-scroll" style="height:100%; width: 86%" >
-            <div>
-                <el-table
-                        :data="showPageData"
-                        style="width: 100%; height: 100%;"
-                        border
-                        :row-class-name="tableRowClassName"
-                        :header-cell-style="{background: '#F5F5F5'}"
-                        :default-sort = "{prop: 'c_date', order: 'ascending'}">
-                    <el-table-column label="版本" width="110" min-width="110" header-align="center" prop="t_versions" >
-                    </el-table-column>
-                    <el-table-column label="模块" width="110" min-width="110" header-align="center" prop="t_module">
-                    </el-table-column>
-                    <el-table-column label="测试点" width="180" min-width="180" header-align="center" prop="t_testpointVal">
-                    </el-table-column>
-                    <el-table-column label="前置条件" width="217" min-width="217" header-align="center" prop="t_precondition">
-                    </el-table-column>
-                    <el-table-column label="操作步骤" width="305" min-width="305" header-align="center" prop="t_step">
-                    </el-table-column>
-                    <el-table-column label="预期结果" width="213" min-width="213" header-align="center" prop="t_expectedResult">
-                    </el-table-column>
-                    <el-table-column label="实际结果" width="199" min-width="199" header-align="center" prop="t_actualResults">
-                    </el-table-column>
-                    <el-table-column label="是否通过" width="50" min-width="50" header-align="center" prop="t_pass">
-                    </el-table-column>
-                    <el-table-column label="是否有效" width="50" min-width="50" header-align="center" prop="t_effective">
-                    </el-table-column>
-                    <el-table-column label="备注" width="100" min-width="100" header-align="center" prop="t_remark">
-                    </el-table-column>
-                    <el-table-column header-align="center" label="操作" align="center">
-                        <template slot-scope="scope">
-                            <el-button size="mini" type="primary" @click="ChangeEditFlag(scope.$index,scope.row)" icon="el-icon-edit" circle></el-button>
-                            <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)"  icon="el-icon-delete" circle></el-button>
-                        </template>
-                    </el-table-column>
+        <!-- <el-scrollbar class="page-scroll" style="height:{page_scroll_height}; width: 80%" > -->
+        <el-table
+                :data="showPageData"
+                style="width: 100%; height: 100%;"
+                border
+                :row-class-name="tableRowClassName"
+                :header-cell-style="{background: '#F5F5F5'}"
+                :default-sort = "{prop: 'c_date', order: 'ascending'}">
+            <el-table-column label="版本" width="110" min-width="110" header-align="center" prop="t_versions" >
+            </el-table-column>
+            <el-table-column label="模块" width="110" min-width="110" header-align="center" prop="t_module">
+            </el-table-column>
+            <el-table-column label="测试点" width="180" min-width="180" header-align="center" prop="t_testpointVal">
+            </el-table-column>
+            <el-table-column label="前置条件" width="217" min-width="217" header-align="center" prop="t_precondition">
+            </el-table-column>
+            <el-table-column label="操作步骤" width="280" min-width="280" header-align="center" prop="t_step">
+            </el-table-column>
+            <el-table-column label="预期结果" width="213" min-width="213" header-align="center" prop="t_expectedResult">
+            </el-table-column>
+            <el-table-column label="实际结果" width="199" min-width="199" header-align="center" prop="t_actualResults">
+            </el-table-column>
+<!--            <el-table-column label="是否通过" width="50" min-width="50" header-align="center" prop="t_pass">-->
+<!--            </el-table-column>-->
+<!--            <el-table-column label="是否有效" width="50" min-width="50" header-align="center" prop="t_effective">-->
+<!--            </el-table-column>-->
+            <el-table-column label="备注" width="100" min-width="100" header-align="center" prop="t_remark">
+            </el-table-column>
+            <el-table-column label="提交人" width="100" min-width="100" header-align="center" prop="t_username">
+            </el-table-column>
 
-                </el-table>
-            </div>
+            <el-table-column header-align="center" label="操作" align="center">
+                <template slot-scope="scope">
+                    <el-button size="mini" type="primary" @click="ChangeEditFlag(scope.$index,scope.row)" icon="el-icon-edit" circle></el-button>
+                    <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)"  icon="el-icon-delete" circle></el-button>
+                </template>
+            </el-table-column>
 
-        </el-scrollbar>
+        </el-table>
+
         <!-- 分页 -->
         <div class="pageblock" >
             <el-pagination
@@ -68,6 +72,9 @@
                     :total="caseData.length">
             </el-pagination>
         </div>
+
+        <!-- </el-scrollbar> -->
+        
         <Edit :visible.sync="edit_show_flag" v-if="edit_show_flag" :current_data="current_data" @reload="reload"></Edit>
 
     </div>
@@ -86,16 +93,27 @@
     .page-scroll{
         height: 100%;
         overflow-x: hidden;
-         position: absolute;
+        position: absolute;
 
     }
 
     .bugs{
         margin: 1%;
+        top: 0;
+    }
+
+    h3{
+        float: left;
     }
 
     .head{
-        margin-bottom: 1%;
+        margin-bottom: 7%;
+    }
+
+    .head_fun{
+        margin-top: 3%;
+        float: left;
+        margin-left: -8%;
     }
 
     .cell{
@@ -103,16 +121,23 @@
         white-space: pre-line;
     }
 
-    .case{
+    .case {
         margin-left: 2%;
-        outline-style: none ;
+        outline-style: none;
         padding: 13px 14px;
         width: 12%;
         font-size: 14px;
         font-weight: 700;
-        font-family: "Microsoft soft";
-    }
+        font-family: "Microsoft soft",serif;
+        
 
+    }
+    .upload{
+        float: right;
+    }
+    .download{
+        float: right;
+    }
     .el-tag{
         border: none;
         background-color:transparent;
@@ -130,11 +155,11 @@
     .pageblock{
         margin-top: 5%;
         text-align: center;
-        position:fixed; //固定底部
-        bottom:0;       //固定底部
+        // position:fixed; //固定底部
+        // bottom:0;       //固定底部
         height: 50px;
         width: 100px;
-        left:40%;
+        margin-left: 20%;
         right: 0;
     }
 
@@ -158,7 +183,7 @@
     import Edit from './case_edit'
     import XLSX from 'xlsx'
     import exportExcelCommon from './ExportExcelCommon'
-    import FileSaver from 'file-saver'
+
     export default {
         name:'Excel',
         components:{
@@ -172,12 +197,16 @@
                 show_flag: false,
                 edit_show_flag: false,
                 report_show_flag: false,
+                delete_btn:false,
+                page_scroll_height: document.body.clientHeight,
 
                 outputs: [],
                 t_info: [],
 
                 // 搜索内容
-                search_data: "",
+                search_data_versions: "",
+                search_data_module:"",
+                search_data_testpoint:"",
                 //excel数据
                 excelData:[],
 
@@ -210,13 +239,38 @@
                 // 结束展示的index
                 end_index: 0,
 
-                search: ''
+                search: '',
+
+                fullHeight: document.documentElement.clientHeight
             }
         },
 
         mounted: function(){
             this.getTestCaseList();
+            if(this.$store.state.user  ===  'zhaohuabing'){
+                this.delete_btn = true;
+            }
 
+            const that = this;
+            window.onresize = () => {
+                return (() => {
+                window.fullHeight = document.documentElement.clientHeight;
+                that.fullHeight = window.fullHeight
+                })()
+            }
+        },
+
+        watch: {
+            fullHeight (val) {
+                if(!this.timer) {
+                this.fullHeight = val;
+                this.timer = true;
+                let that = this;
+                setTimeout(function (){
+                    that.timer = false
+                },400)
+                }
+            }
         },
 
         methods: {
@@ -232,17 +286,17 @@
             },
 
             reload(){
-                if(this.edit_show_flag == true){
-                    console.log("编辑组件调用了刷新")
+                if(this.edit_show_flag === true){
+                    console.log("编辑组件调用了刷新");
                     this.edit_show_flag = false;
                 }
-                if(this.show_flag == true){
-                    console.log("添加组件调用了刷新")
+                if(this.show_flag === true){
+                    console.log("添加组件调用了刷新");
                     this.show_flag = false;
                 }
 
-                if(this.report_show_flag == true){
-                    console.log("报告组建调用了刷新")
+                if(this.report_show_flag === true){
+                    console.log("报告组建调用了刷新");
                     this.report_show_flag = false;
                 }
                 //可以刷新列表什么的
@@ -281,27 +335,32 @@
             },
             //批量生成
             batchProduce(){
-                let that = this;
-                if(this.excelData.length == 0){
-                    this.$message.error("请选择文件");
-                    return
-                }
-                var jsonData = JSON.parse(JSON.stringify(this.excelData));
+                console.log(this.$store.state.user);
+                if(this.$store.state.user != null){
+                    let that = this;
+                    if(this.excelData.length === 0){
+                        this.$message.error("请选择文件");
+                        return
+                    }
+                    var jsonData = JSON.parse(JSON.stringify(this.excelData));
 
-                axios({
-                    method:'post',
-                    url:'/api/knowledge/excel_data',
-                    data: {
-                        "data": this.excelData,
-                    }
-                }).then(function (resp) {
-                    if(resp.data["code"] == 200 ){
-                        that.getTestCaseList();
-                    }
-                    alert(resp.data["msg"]);
-                }).catch(resp => {
-                    console.log('请求失败：'+resp.status+','+resp.statusText);
-                });
+                    axios({
+                        method:'post',
+                        url:'/api/knowledge/excel_data',
+                        data: {
+                            "data": this.excelData,
+                            "username":this.$store.state.user,
+                        }
+                    }).then(function (resp) {
+                        if(resp.data["code"] === 200 ){
+                            that.getTestCaseList();
+                        }
+                        alert(resp.data["msg"]);
+                    }).catch(resp => {
+                        console.log('请求失败：'+resp.status+','+resp.statusText);
+                    });
+                }else {this.$message.error("请先登录.")}
+
             },
             //删除当前页面所有数据
             deletePageData(){
@@ -376,6 +435,7 @@
 
                 }).then(function(resp){
                     that.caseData = resp.data.sort();
+                    console.log(that.caseData);
                     that.showPageData = that.caseData.slice(0, that.current_page_size);
 
                 }).catch(resp => {
@@ -392,8 +452,7 @@
             //修改修改Bug实例弹窗显示状态
             ChangeEditFlag(index,row){
                 if(this.$store.state.user != null){
-                    let new_data = JSON.parse(JSON.stringify(row));
-                    this.current_data = new_data;
+                    this.current_data = JSON.parse(JSON.stringify(row));
                     this.edit_show_flag = true;
                 }else{
                     this.$message.error("请先登录.")
@@ -428,11 +487,16 @@
 
             Search(){
                 let that = this;
+                var data_list = {};
+                data_list["versions"] = that.search_data_versions;
+                data_list["module"] = that.search_data_module;
+                data_list["testpoint"] = that.search_data_testpoint;
+
                 axios({
                     method:'get',
                     url:'/api/knowledge/case_search',
                     params: {
-                        'data': that.search_data
+                        'data': data_list
                     }
                 }).then(function(resp){
                     that.caseData = resp.data.sort();
@@ -463,7 +527,7 @@
                 let n = val;
                 let end_index = count * n - 1;
                 let start_index;
-                if(n == 1){
+                if(n === 1){
                     start_index = 0;
                     end_index = count;
                 }else{

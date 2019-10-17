@@ -4,11 +4,21 @@
         <!-- 添加、搜索功能 -->
         <div class="head">
             <h3>娄底放炮罚</h3>
-            <el-button type="danger" @click="getBugsList">刷新数据</el-button>
-            <el-button type="danger" @click="ChangeAddFlag" >添加测试用例</el-button>
-            <el-input type="text" prefix-icon="el-icon-search" required style="width:200px;" v-model="search_data" placeholder="请输入关键字搜索..."></el-input>
-            <el-button type="primary" @click="Search" >搜索</el-button>
-            <AddBugs :visible.sync="show_flag" v-if="show_flag" @reload="reload"></AddBugs>
+            <div class="head_fun">
+                <el-button type="danger" @click="getBugsList">刷新数据</el-button>
+                <el-button type="danger" @click="ChangeAddFlag" >添加测试用例</el-button>
+                <el-select v-model="selected_item" multiple placeholder="请选择提交人" collapse-tags>
+                    <el-option
+                            v-for="item in select_option"
+                            :key="item.name"
+                            :label="item.value"
+                            :value="item.value"
+                    >
+                    </el-option>
+                </el-select>
+                <el-button type="primary" @click="Search" >搜索</el-button>
+                <AddBugs :visible.sync="show_flag" v-if="show_flag" @reload="reload"></AddBugs>
+            </div>
         </div>
 
 
@@ -35,27 +45,36 @@
             <el-table-column prop="c_file_name" v-if="false">
             </el-table-column>
 
-            <el-table-column label="日期" width="130" prop="c_date" sortable header-align="center" align="center">
+            <el-table-column label="日期" width="110" prop="show_time" sortable header-align="center" align="center">
                 <template slot-scope="scope">
-                    <i class="el-icon-time"></i>
-                    <span style="margin-left: 10px">{{ scope.row.c_date }}</span>
+                    <span style="margin-left: 10px">{{ scope.row.show_time }}</span>
                 </template>
             </el-table-column>
 
             <el-table-column label="提交人" width="100" prop="c_name" header-align="center" align="center">
             </el-table-column>
-            <el-table-column label="用戶mid" width="100" prop="c_mid" header-align="center" align="center">
+            <el-table-column label="用戶mid" width="100" prop="c_user" header-align="center" align="center">
+                <template slot-scope="scope">
+                    <p v-for="item in scope.row.c_user" style="margin:0;text-align: justify">{{item.name}}: {{item.value}}</p>
+                </template>
             </el-table-column>
             <el-table-column label="测试目的" width="190" header-align="center" align="center" prop="c_purpose">
             </el-table-column>
 
             <el-table-column label="创房选项" width="290" min-width="180" header-align="center" prop="c_RoomOptions">
+                    <template slot-scope="scope">
+                        <p v-for="item in scope.row.c_RoomOptions" style="margin:0;">{{item.name}}: {{item.value}}</p>
+                    </template>
             </el-table-column>
 
             <el-table-column label="做牌数据" width="290" min-width="180" header-align="center" prop="c_cards">
+
             </el-table-column>
 
             <el-table-column label="操作步骤" width="290" min-width="180" header-align="center" prop="c_step">
+                <template slot-scope="scope">
+                    <p v-for="item in scope.row.c_step" style="margin:0;">{{item.users}}：{{item.operation}}-->{{item.card}}</p>
+                </template>
             </el-table-column>
 
             <el-table-column label="备注" width="130" align="center" prop="c_remake">
@@ -97,10 +116,22 @@
 <style lang="less" scoped>
     .bugs{
         margin: 1%;
+        top: 0;
+    }
+
+    h3{
+        float: left;
     }
 
     .head{
-        margin-bottom: 1%;
+        float: left;
+    }
+
+    .head_fun{
+        margin-top: 10%;
+        float: left;
+        margin-left: -16%;
+        margin-bottom: 3%;
     }
 
     .cell{
@@ -144,6 +175,7 @@
     import axios from 'axios'
     import AddBugs from './add_ldfpf'
     import EditBugs from './edit_ldfpf'
+    import {timeFormat,roomDataFormat,midFormat,remove,get_dict} from '../../../../../../libs/time.js'
     import Reports from '../../../../reports/report'
     import { truncate } from 'fs';
     import { start } from 'repl';
@@ -159,10 +191,6 @@
                 show_flag: false,
                 edit_show_flag: false,
                 report_show_flag: false,
-
-                // 搜索内容
-                search_data: "",
-
                 // 编辑子组件传递数据类型
                 current_data:{},
 
@@ -188,7 +216,9 @@
                 // 结束展示的index
                 end_index: 0,
 
-                search: ''
+                select_option: [],
+                selected_item: [],
+
             }
         },
 
@@ -226,12 +256,17 @@
                     }
                 }).then(function(resp){
                     that.caseData = resp.data.sort();
-                    that.showcaseData = that.caseData.slice(0, that.current_page_size);
-                    for (var i in that.showcaseData){
-                        that.showcaseData[i]["c_step"] = JSON.stringify(that.showcaseData[i]["c_operate"]); //操作步骤
-                        that.showcaseData[i]["c_RoomOptions"] = JSON.stringify(that.showcaseData[i]["c_option"]) //创房选项
-
+                    // 获取人员列表去重操作
+                    that.select_option = remove(that.caseData);
+                    for (var i in that.caseData){
+                        that.setp_list = that.caseData[i]["c_operate"];
+                        that.caseData[i]["c_step"] = (that.caseData[i]["c_operate"]); //操作步骤
+                        that.caseData[i]["c_user"] = (midFormat(that.caseData[i]["c_mid"]));
+                        that.caseData[i]["c_RoomOptions"] = roomDataFormat(that.caseData[i]["c_option"]); //创房选项
+                        that.caseData[i]["show_time"] = timeFormat(that.caseData[i]["c_date"]);
                     }
+                    that.showcaseData = that.caseData.slice(0, that.current_page_size);
+
 
 
                 }).catch(resp => {
@@ -319,8 +354,10 @@
                         'r_id': r_id
                     }
                 }).then(function(resp){
-                    console.log(resp.data)
                     that.report_current_data = resp.data.sort();
+                    for (var i in that.report_current_data){
+                        that.report_current_data[i]["r_end_time"] = timeFormat(that.report_current_data[i]["r_end_time"]);
+                    }
                     that.report_show_flag = true
                 }).catch(resp => {
                     that.$message.error('请求失败：'+resp.status+','+resp.statusText);
@@ -329,27 +366,29 @@
 
             Search(){
                 let that = this;
-                if( that.search_data == ''){
-                    alert("请输入要搜索的内容.")
-                }else{
-                    console.log("search: %s", that.search_data)
-                    axios({
-                        method:'get',
-                        url:'/api/cases/search',
-                        params: {
-                            'c_name': that.search_data
-                        }
-                    }).then(function(resp){
-                        that.caseData = resp.data.sort();
-                        that.showcaseData = that.caseData.slice(0, that.current_page_size)
-                        console.log("data", that.caseData)
+                var data_dict = get_dict(that.selected_item, that.select_option);
+                axios({
+                    method:'get',
+                    url:'/api/cases/search',
+                    params: {
+                        'data': data_dict,
+                        'c_play': '娄底放炮罚'
+                    }
+                }).then(function(resp){
+                    that.caseData = resp.data.sort();
+                    for (var i in that.caseData){
+                        that.setp_list = that.caseData[i]["c_operate"];
+                        that.caseData[i]["c_step"] = (that.caseData[i]["c_operate"]); //操作步骤
+                        that.caseData[i]["c_user"] = (midFormat(that.caseData[i]["c_mid"]));
+                        that.caseData[i]["c_RoomOptions"] = roomDataFormat(that.caseData[i]["c_option"]); //创房选项
+                        that.caseData[i]["show_time"] = timeFormat(that.caseData[i]["c_date"]);
+                    }
+                    that.showcaseData = that.caseData.slice(0, that.current_page_size)
+                }).catch(resp => {
+                    console.log('请求失败：'+resp.status+','+resp.statusText);
+                });
 
-                    }).catch(resp => {
-                        console.log('请求失败：'+resp.status+','+resp.statusText);
-                    });
-                }
             },
-
 
 
             tableRowClassName({row, rowIndex}) {

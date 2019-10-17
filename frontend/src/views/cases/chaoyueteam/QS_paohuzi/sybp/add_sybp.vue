@@ -2,7 +2,7 @@
     <div v-if="add_visible" class="lg">
       <el-dialog 
       title="添加测试用例 - 邵阳剥皮" 
-      width="60%"
+      width="40%"
       center
       :show-close = "false"
       :modal-append-to-body="false"
@@ -15,9 +15,7 @@
             <el-date-picker type="datetime" style="width: 100%;" placeholder="选择日期" v-model="AddCaseForm.c_date"></el-date-picker>
           </el-form-item>
 
-          <el-form-item label="提 交 人" prop="c_name">
-            <el-input type="text" placeholder="请输入提交人信息" v-model="AddCaseForm.c_name"></el-input>
-          </el-form-item>
+
           <el-form-item label="用户mid" prop="c_mid">
             <el-input type="text" placeholder="输入mid,例:[127843,127641,127854]" v-model="AddCaseForm.c_mid"></el-input>
           </el-form-item>
@@ -167,7 +165,7 @@
         </el-form>
         <el-form :model="operationForm"
                    ref="operationForm"
-                   label-width="130px"
+                   label-width="80px"
                    center
                    size="small">
               <el-form-item label="测试步骤"  prop="servin" >
@@ -178,7 +176,7 @@
                               <template slot-scope="scope">
                                   <el-select v-model="scope.row.users" clearable  >
                                       <el-option
-                                              v-for="item in users"
+                                              v-for="item in users.slice(0,AddCaseForm.c_options.o_player)"
                                               :key="item.value"
                                               :label="item.text"
                                               :value="item.value">
@@ -200,7 +198,22 @@
                           </el-table-column>
                           <el-table-column prop="card" label="牌">
                               <template slot-scope="scope">
-                                  <el-input size="mini" v-model="scope.row.card"  ></el-input>
+                                  <el-select v-model="scope.row.card" multiple clearable placeholder="请选择牌型" v-show="getOption(operationList[scope.$index].operation) === true" >
+                                      <el-option
+                                              v-for="item in card_type"
+                                              :key="item.value"
+                                              :label="item.text"
+                                              :value="item.value">
+                                      </el-option>
+                                  </el-select>
+                                  <el-select v-model="scope.row.in_jiachui" placeholder="请选择是否加锤" v-show="operationList[scope.$index].operation === '加锤' ">
+                                      <el-option
+                                              v-for="item in jiaochui_type"
+                                              :key="item.value"
+                                              :label="item.text"
+                                              :value="item.value">
+                                      </el-option>
+                                  </el-select>
                               </template>
                           </el-table-column>
                           <el-table-column fixed="right"  label="操作">
@@ -298,6 +311,91 @@ import axios from 'axios'
               {text:'吃牌',value:'吃牌'},
               {text:'出牌',value:'出牌'},
               {text:'过牌',value:'过牌'},
+              {text:'加锤',value:'加锤'},
+          ],
+          operation_list:['碰牌', '吃牌', '出牌'],
+          jiaochui_type:[{ text: '是',value: '是'},{ text: '否',value: '否'}],
+          card_type:[
+              {
+                  text: '1s',
+                  value: '1s'
+              },
+              {
+                  text: '2s',
+                  value: '2s'
+              },          {
+                  text: '3s',
+                  value: '3s'
+              },
+              {
+                  text: '4s',
+                  value: '4s'
+              },
+              {
+                  text: '5s',
+                  value: '5s'
+              },
+              {
+                  text: '6s',
+                  value: '6s'
+              },
+              {
+                  text: '7s',
+                  value: '7s'
+              },
+              {
+                  text: '8s',
+                  value: '8s'
+              },
+              {
+                  text: '9s',
+                  value: '9s'
+              },
+              {
+                  text: 'Ts',
+                  value: 'Ts'
+              },
+              {
+                  text: '1b',
+                  value: '1b'
+              },
+              {
+                  text: '2b',
+                  value: '2b'
+              },
+              {
+                  text: '3b',
+                  value: '3b'
+              },
+              {
+                  text: '4b',
+                  value: '4b'
+              },
+              {
+                  text: '5b',
+                  value: '5b'
+              },
+              {
+                  text: '6b',
+                  value: '6b'
+              },
+              {
+                  text: '7b',
+                  value: '7b'
+              },
+              {
+                  text: '8b',
+                  value: '8b'
+              },
+              {
+                  text: '9b',
+                  value: '9b'
+              },
+              {
+                  text: 'Tb',
+                  value: 'Tb'
+              },
+
           ],
         AddCaseForm: {
           c_project: '超越项目组',
@@ -397,7 +495,7 @@ import axios from 'axios'
             }
         },
         addRow(tableData,event){
-            tableData.push({users: '',operation:'', card:''})
+            tableData.push({users: '',operation:'', card:[]})
         },
         deleteRow(index, rows){
             ////删除改行
@@ -444,66 +542,49 @@ import axios from 'axios'
                 this.doublePlusNewShowFlag = false;
             }
         },
-    
+        getOption(val){
+            for(var i in this.operation_list){
+                if (val === this.operation_list[i]){
+                    return true
+                }
+            }
+        },
       AddCase(){
+          let that = this;
           if(this.$store.state.user != null){
               if(this.AddCaseForm.c_date == ''){
-                this.$message.error("日期不能为空.")
-                return
-              }
-
-              if(this.AddCaseForm.c_name == ''){
-                this.$message.error("提交人不能为空.")
+                this.$message.error("日期不能为空.");
                 return
               }
 
 
               if(this.AddCaseForm.c_purpose == ''){
-                this.$message.error("测试目的不能为空.")
+                this.$message.error("测试目的不能为空.");
                 return
               }
 
               if(this.AddCaseForm.c_cards == ''){
-                this.$message.error("做牌数据不能为空.")
+                this.$message.error("做牌数据不能为空.");
                 return
               }
 
-
-              let that = this;
-              if(this.AddCaseForm.c_options.o_player == 3){
-                  var options = {
-                    '玩法选项':this.AddCaseForm.c_options,
-                    '人数': this.AddCaseForm.c_options.o_player,
-                    '局数': this.AddCaseForm.c_options.o_round,
-                    '胡一等': this.AddCaseForm.c_options.o_huyideng,
-                }
-              }else{
-                options = this.AddCaseForm.c_options
-              }
-
-              if(this.AddCaseForm.c_options.o_wanfa != ""){
-                options["玩法"] = this.AddCaseForm.c_options.o_wanfa
-              }
-
-              console.log("玩法选项"+options);
-
-              
               axios({
                   method:'post',
                   url:'/api/cases/c_add',
                   data: {
                       c_cards: this.AddCaseForm.c_cards,
                       c_date: this.AddCaseForm.c_date,
-                      c_name: this.AddCaseForm.c_name,
+                      c_name: this.$store.state.user,
                       c_account:this.AddCaseForm.c_mid,
                       c_purpose: this.AddCaseForm.c_purpose,
                       c_remake: this.AddCaseForm.c_remake,
                       c_steps: this.operationList,
                       c_project: this.AddCaseForm.c_project + '-' + this.AddCaseForm.c_version,
                       c_play: this.AddCaseForm.c_play,
-                      c_options: options,
+                      c_options: this.AddCaseForm.c_options,
                   }
                }).then(function(resp){
+                    console.log("xxxxx",resp.data);
                   if (resp.data["code"]==300){
                       alert(resp.data["Msg"])
                   }else {

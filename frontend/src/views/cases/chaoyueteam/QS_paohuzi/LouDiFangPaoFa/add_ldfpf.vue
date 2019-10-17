@@ -2,7 +2,7 @@
     <div v-if="add_visible" class="lg">
         <el-dialog
                 title="添加测试用例 - 娄底放炮罚"
-                width="60%"
+                width="40%"
                 center
                 :show-close = "false"
                 :modal-append-to-body="false"
@@ -15,9 +15,6 @@
                     <el-date-picker type="datetime" style="width: 100%;" placeholder="选择日期" v-model="AddCaseForm.c_date"></el-date-picker>
                 </el-form-item>
 
-                <el-form-item label="提 交 人" prop="c_name">
-                    <el-input type="text" placeholder="请输入提交人信息" v-model="AddCaseForm.c_name"></el-input>
-                </el-form-item>
 
                 <el-form-item label="用户mid" prop="c_mid">
                     <el-input type="text" placeholder="输入mid,例:[127843,127641,127866]" v-model="AddCaseForm.c_mid"></el-input>
@@ -77,7 +74,7 @@
                                 <el-radio v-model="AddCaseForm.c_options.o_choupai" label='None'>不抽底牌</el-radio>
                             </template>
                         </div>
-                        <div v-show="ShowFlag">
+                        <div>
                             <template>
                                 <span>请选择封顶：</span>
                                 <el-radio v-model="AddCaseForm.c_options.o_huxi" :label=100>100息</el-radio>
@@ -146,15 +143,6 @@
 
                         <div>
                             <template>
-                                <span>封顶：</span>
-                                <el-radio v-model="AddCaseForm.c_options.o_fengdinghuxi" label="100">100息</el-radio>
-                                <el-radio v-model="AddCaseForm.c_options.o_fengdinghuxi" label="200">200息</el-radio>
-                                <el-radio v-model="AddCaseForm.c_options.o_fengdinghuxi" label="400">400息</el-radio>
-
-                            </template>
-                        </div>
-                        <div>
-                            <template>
                                 <span>玩法：</span>
                                 <el-radio v-model="AddCaseForm.c_options.o_qihu" :label=15>15胡起胡</el-radio>
                                 <el-radio v-model="AddCaseForm.c_options.o_qihu" :label=10>10胡起胡</el-radio>
@@ -176,7 +164,7 @@
             </el-form>
             <el-form :model="operationForm"
                      ref="operationForm"
-                     label-width="130px"
+                     label-width="80px"
                      center
                      size="small">
                 <el-form-item label="测试步骤"  prop="servin" >
@@ -209,7 +197,14 @@
                             </el-table-column>
                             <el-table-column prop="card" label="牌">
                                 <template slot-scope="scope">
-                                    <el-input size="mini" v-model="scope.row.card"  ></el-input>
+                                    <el-select v-model="scope.row.card" multiple clearable placeholder="请选择牌型" v-show="getOption(operationList[scope.$index].operation) === true" >
+                                        <el-option
+                                                v-for="item in card_type"
+                                                :key="item.value"
+                                                :label="item.text"
+                                                :value="item.value">
+                                        </el-option>
+                                    </el-select>
                                 </template>
                             </el-table-column>
                             <el-table-column fixed="right"  label="操作">
@@ -303,6 +298,89 @@
                     {text:'出牌',value:'出牌'},
                     {text:'过牌',value:'过牌'},
                 ],
+                card_type:[
+                    {
+                        text: '1s',
+                        value: '1s'
+                    },
+                    {
+                        text: '2s',
+                        value: '2s'
+                    },          {
+                        text: '3s',
+                        value: '3s'
+                    },
+                    {
+                        text: '4s',
+                        value: '4s'
+                    },
+                    {
+                        text: '5s',
+                        value: '5s'
+                    },
+                    {
+                        text: '6s',
+                        value: '6s'
+                    },
+                    {
+                        text: '7s',
+                        value: '7s'
+                    },
+                    {
+                        text: '8s',
+                        value: '8s'
+                    },
+                    {
+                        text: '9s',
+                        value: '9s'
+                    },
+                    {
+                        text: 'Ts',
+                        value: 'Ts'
+                    },
+                    {
+                        text: '1b',
+                        value: '1b'
+                    },
+                    {
+                        text: '2b',
+                        value: '2b'
+                    },
+                    {
+                        text: '3b',
+                        value: '3b'
+                    },
+                    {
+                        text: '4b',
+                        value: '4b'
+                    },
+                    {
+                        text: '5b',
+                        value: '5b'
+                    },
+                    {
+                        text: '6b',
+                        value: '6b'
+                    },
+                    {
+                        text: '7b',
+                        value: '7b'
+                    },
+                    {
+                        text: '8b',
+                        value: '8b'
+                    },
+                    {
+                        text: '9b',
+                        value: '9b'
+                    },
+                    {
+                        text: 'Tb',
+                        value: 'Tb'
+                    },
+
+                ],
+                operation_list:['碰牌', '吃牌', '出牌'],
                 users:[{text:'玩家1',value:'玩家1'},{text:'玩家2',value:'玩家2'},{text:'玩家3',value:'玩家3'}],
                 operationForm:{},
                 fanbei_ShowFlag: false,
@@ -405,6 +483,13 @@
             handleUpdateDoubelOptions(){
                 console.log("xxx")
             },
+            getOption(val){
+                for(var i in this.operation_list){
+                    if (val === this.operation_list[i]){
+                        return true
+                    }
+                }
+            },
             // 添加新的翻倍积分选项
             doublePlusNew(score){
                 if(score==true){
@@ -465,26 +550,20 @@
                 let that = this;
                 if(this.$store.state.user != null){
                     if(this.AddCaseForm.c_date == ''){
-                        this.$message.error("日期不能为空.")
-                        return
-                    }
-
-                    if(this.AddCaseForm.c_name == ''){
-                        this.$message.error("提交人不能为空.")
+                        this.$message.error("日期不能为空.");
                         return
                     }
 
 
                     if(this.AddCaseForm.c_purpose == ''){
-                        this.$message.error("测试目的不能为空.")
+                        this.$message.error("测试目的不能为空.");
                         return
                     }
 
                     if(this.AddCaseForm.c_cards == ''){
-                        this.$message.error("做牌数据不能为空.")
+                        this.$message.error("做牌数据不能为空.");
                         return
                     }
-
 
                     axios({
                         method:'post',
@@ -492,7 +571,7 @@
                         data: {
                             c_cards: this.AddCaseForm.c_cards,
                             c_date: this.AddCaseForm.c_date,
-                            c_name: this.AddCaseForm.c_name,
+                            c_name: this.$store.state.user,
                             c_purpose: this.AddCaseForm.c_purpose,
                             c_remake: this.AddCaseForm.c_remake,
                             c_steps: this.operationList,

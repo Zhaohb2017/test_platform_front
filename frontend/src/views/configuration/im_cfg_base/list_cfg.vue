@@ -3,37 +3,39 @@
         <!-- 添加、搜索功能 -->
         <div class="head">
             <h3>跑脚本服务器列表</h3>
-            <el-button type="danger" @click="getKnowledgeList">刷新数据</el-button>
-            <el-button type="danger" @click="ChangeAddFlag" >添加</el-button>
-            <el-input type="text" prefix-icon="el-icon-search" required style="width:200px;" v-model="search_data" placeholder="IP搜索..."></el-input>
-            <el-button type="primary" @click="Search" >搜索</el-button>
-            <Addknowledge :visible.sync="show_flag" v-if="show_flag" @reload="reload"></Addknowledge>
+            <div class="head_fun">
+                <el-button type="danger" @click="getKnowledgeList">刷新数据</el-button>
+                <el-button type="danger" @click="ChangeAddFlag" >添加</el-button>
+                <el-input type="text" prefix-icon="el-icon-search" required style="width:200px;" v-model="search_data" placeholder="IP搜索..."></el-input>
+                <el-button type="primary" @click="Search" >搜索</el-button>
+                <Addknowledge :visible.sync="show_flag" v-if="show_flag" @reload="reload"></Addknowledge>
+            </div>
         </div>
-        <el-scrollbar class="page-scroll" style="height: 70%; width: 80%">
+        <!-- <el-scrollbar class="page-scroll" style="height: 70%; width: 80%"> -->
             <!-- 展示列表 -->
-            <el-table
-                    :data="showSkillData"
-                    style="width: 100%"
-                    border
-                    :row-class-name="tableRowClassName"
-                    :header-cell-style="{background: '#F5F5F5'}"
-                    :default-sort = "{prop: 'c_date', order: 'ascending'}">
+        <el-table
+                :data="showSkillData"
+                style="width: 100%"
+                border
+                :row-class-name="tableRowClassName"
+                :header-cell-style="{background: '#F5F5F5'}"
+                :default-sort = "{prop: 'c_date', order: 'ascending'}">
 
-                <el-table-column label="IP" width="450" min-width="150" header-align="center" prop="t_ip">
-                </el-table-column>
+            <el-table-column label="IP" width="450" min-width="150" header-align="center" prop="t_ip">
+            </el-table-column>
 
-                <el-table-column label="port" width="400" min-width="100" header-align="center" prop="t_port" >
-                </el-table-column>
-                <el-table-column label="备注" width="300" min-width="180" header-align="center" prop="t_remark" >
-                </el-table-column>
-                <el-table-column header-align="center" label="操作" align="center">
-                    <template slot-scope="scope">
-                        <el-button size="mini" type="primary" @click="ChangeEditFlag(scope.$index,scope.row)" icon="el-icon-edit" circle></el-button>
-                        <el-button size="mini" type="danger" @click="handleDelete(scope.$index,scope.row)" icon="el-icon-delete" circle></el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-        </el-scrollbar>
+            <el-table-column label="port" width="400" min-width="100" header-align="center" prop="t_port" >
+            </el-table-column>
+            <el-table-column label="备注" width="300" min-width="180" header-align="center" prop="t_remark" >
+            </el-table-column>
+            <el-table-column header-align="center" label="操作" align="center">
+                <template slot-scope="scope">
+                    <el-button size="mini" type="primary" @click="ChangeEditFlag(scope.$index,scope.row)" icon="el-icon-edit" circle></el-button>
+                    <el-button size="mini" type="danger" @click="handleDelete(scope.$index,scope.row)" icon="el-icon-delete" circle></el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <!-- </el-scrollbar> -->
 
         <div class="pageblock" >
             <el-pagination
@@ -47,7 +49,7 @@
                     :total="showDeployData.length">
             </el-pagination>
         </div>
-        <EditSkills :visible.sync="edit_show_flag" v-if="edit_show_flag" :current_data="current_data" @reload="reload" ></EditSkills>
+        <Edit :visible.sync="edit_show_flag" v-if="edit_show_flag" :current_data="current_data" @reload="reload" ></Edit>
 
     </div>
 </template>
@@ -55,11 +57,24 @@
 <style lang="less" scoped>
     .bugs{
         margin: 1%;
+        top: 0;
+    }
+
+    h3{
+        float: left;
     }
 
     .head{
-        margin-bottom: 1%;
+        float: left;
     }
+
+    .head_fun{
+        margin-top: 10%;
+        float: left;
+        margin-left: -24.5%;
+        margin-bottom: 3%;
+    }
+
     .page-scroll{
         height: 100%;
         overflow-x: hidden;
@@ -117,9 +132,11 @@
 <script>
     import axios from 'axios'
     import Addknowledge from './add_cfg'
+    import Edit from  './edit.cfg'
     export default {
         components:{
             Addknowledge,
+            Edit
         },
 
         data() {
@@ -191,7 +208,6 @@
                 }).then(function(resp){
                     that.showDeployData = resp.data.sort();
                     that.showSkillData = that.showDeployData.slice(0, that.current_page_size);
-                    console.log("showData1111111111111: ", that.showSkillData)
                 }).catch(resp => {
                     console.log('请求失败：'+resp.status+','+resp.statusText);
                 });
@@ -203,11 +219,24 @@
                 console.log("刷新弹窗: ", this.show_flag)
             },
 
+            //修改修改Bug实例弹窗显示状态
+            ChangeEditFlag(index,row){
+                if(this.$store.state.user != null){
+                    console.log("FFFFFF",row);
+                    let new_data = JSON.parse(JSON.stringify(row));
+                    this.current_data = new_data;
+                    this.edit_show_flag = true;
+                }else{
+                    this.$message.error("请先登录.")
+                }
+
+            },
+
             // 删除数据
             handleDelete(index, row) {
                 if(this.$store.state.user != null){
                     if(confirm("确认要删除么?")){
-                        let t_id = row['t_id']
+                        let t_id = row['t_id'];
                         console.log(11111,index, t_id);
                         let that = this;
                         axios({

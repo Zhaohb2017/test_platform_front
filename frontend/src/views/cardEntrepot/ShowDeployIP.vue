@@ -1,4 +1,5 @@
 <template>
+
     <div v-if="add_visible" class="lg">
         <el-dialog
                 title="选择上传至服务器"
@@ -23,10 +24,22 @@
                 <el-table-column label="账户" width="150" min-width="150" header-align="center" prop="t_user" >
                 </el-table-column>
                 <el-table-column label="密码" width="100" min-width="100" header-align="center" prop="t_pwd" >
+
                 </el-table-column>
                 <el-table-column label="路径" width="400" min-width="180" header-align="center" prop="t_path" >
+
+                    <template slot-scope="scope">
+                        <el-select v-model="senddata.t_path" placeholder="请选择" style="width: 100%" >
+                            <el-option
+                                    v-for="item in path_dict[scope.$index]"
+                                    :key="item.c_path"
+                                    :label="item.c_path"
+                                    :value="item.c_path">
+                            </el-option>
+                        </el-select>
+                    </template>
                 </el-table-column>
-                <el-table-column label="格式转换" width="100" min-width="180" header-align="center" prop="on" align="center" >
+                <el-table-column label="转换JSON数据" width="120" min-width="180" header-align="center" prop="on" align="center" >
                     <template slot-scope="scope">
                         <el-switch
                                 v-model="scope.row.on"
@@ -132,8 +145,9 @@
             return {
                 add_visible: this.visible,
                 re_data: '',
-                showSkillData:[{on:"1"}],
+                showSkillData:[{on:"1"},{t_path:""}],
                 active:"",
+                path_dict:[],
                 value1: true,
                 senddata:{
 
@@ -175,32 +189,33 @@
 
             },
             reload() {
-                if (this.edit_show_flag == true) {
-                    console.log("编辑组件调用了刷新")
+                if (this.edit_show_flag === true) {
+                    console.log("编辑组件调用了刷新");
                     this.edit_show_flag = false;
                 }
-                if (this.show_flag == true) {
-                    console.log("添加组件调用了刷新")
+                if (this.show_flag === true) {
+                    console.log("添加组件调用了刷新");
                     this.show_flag = false;
                 }
 
-                if (this.report_show_flag == true) {
-                    console.log("报告组建调用了刷新")
+                if (this.report_show_flag === true) {
+                    console.log("报告组建调用了刷新");
                     this.report_show_flag = false;
                 }
                 //可以刷新列表什么的
                 this.getKnowledgeList()
             },
 
+
             Send(data){
                 let that = this;
                 that.senddata.t_filename =data.t_filename;
                 that.senddata.t_ip =data.t_ip;
-                that.senddata.t_path =data.t_path;
+                // that.senddata.t_path =data.t_path;
                 that.senddata.t_port =data.t_port;
                 that.senddata.t_pwd =data.t_pwd;
                 that.senddata.t_user =data.t_user;
-                if(data.on == undefined){
+                if(data.on === undefined){
                     data.on = false;
                 }
                 axios({
@@ -216,6 +231,7 @@
                         "filename":that.senddata.t_filename,
                         "card":this.current_data.t_card,
                     }
+
                 }).then(function(resp){
                     var msg = resp.data ;
                     alert(msg);
@@ -236,7 +252,13 @@
                     url: '/api/deployip/i_list',
                 }).then(function (resp) {
                     that.showSkillData = resp.data.sort();
-                    that.showSkillData = that.showSkillData.slice(0, that.current_page_size)
+                    for (var i in that.showSkillData){
+                        that.path_dict.push(JSON.parse(JSON.stringify(that.showSkillData[i]['t_path'])));
+                        // that.path_dict = (JSON.parse(JSON.stringify(that.showSkillData[i]['t_path'])));
+                        console.log('fffffffff',that.path_dict);
+                    }
+                    that.showSkillData = that.showSkillData.slice(0, that.current_page_size);
+
                 }).catch(resp => {
                     console.log('请求失败：' + resp.status + ',' + resp.statusText);
                 });
